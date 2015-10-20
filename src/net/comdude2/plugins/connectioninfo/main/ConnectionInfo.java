@@ -38,8 +38,10 @@ public class ConnectionInfo extends JavaPlugin{
 	public ConnectionHandler handle = null;
 	
 	public void onEnable(){
+		//Save default config
+		this.saveDefaultConfig();
 		//Initialise log
-		log = new Log(this.getDescription().getName(),this.getDataFolder().getAbsolutePath() + "/",true, this.getLogger());
+		log = new Log(this.getDescription().getName(),new File(this.getDataFolder().getAbsolutePath() + "/"),true, this.getLogger());
 		
 		// Export licence
 		File path = new File("");

@@ -20,6 +20,7 @@ Contact: admin@mcviral.net
 
 package net.comdude2.plugins.connectioninfo.util;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 public class Log {
@@ -28,10 +29,10 @@ public class Log {
 	private Logger mc = null;
 	private net.comdude2.plugins.comlibrary.util.Log log = null;
 	
-	public Log(String name, String path, boolean debug, Logger mc){
+	public Log(String name, File file, boolean debug, Logger mc){
 		this.name = name;
 		this.mc = mc;
-		this.log = new net.comdude2.plugins.comlibrary.util.Log(name, path, debug);
+		this.log = new net.comdude2.plugins.comlibrary.util.Log(name, file, debug);
 	}
 	
 	public void info(String message){
