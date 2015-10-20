@@ -20,16 +20,62 @@ Contact: admin@mcviral.net
 
 package net.comdude2.plugins.connectioninfo.main;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import net.comdude2.plugins.comlibrary.util.Log;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConnectionInfo extends JavaPlugin{
 	
+	protected Log log = null;
+	
 	public void onEnable(){
+		//Initialise log
+		log = new Log(this.getDescription().getName(),this.getDataFolder().getAbsolutePath() + "/",true);
 		
+		// Export licence
+		File path = new File("");
+		File f = new File(path.getAbsolutePath() + "ConnectionInfo_Licence.txt");
+		if (!f.exists()){
+			try{
+				exportResource("LICENCE.txt", f);
+			}catch(Exception e){
+				
+				e.printStackTrace();
+			}
+		}
+		
+		//Main
 	}
 	
 	public void onDisable(){
 		
+	}
+	
+	private void exportResource(String resourceName, File destination) throws Exception {
+		InputStream stream = null;
+        OutputStream resStreamOut = null;
+        try {
+        	stream = this.getClass().getResourceAsStream(resourceName);
+            if(stream == null) {
+            	throw new Exception("Can't get resource '" + resourceName + "' from Jar file.");
+            }
+            int readBytes;
+            byte[] buffer = new byte[4096];
+            resStreamOut = new FileOutputStream(destination);
+            while ((readBytes = stream.read(buffer)) > 0) {
+            	resStreamOut.write(buffer, 0, readBytes);
+            }
+        } catch (Exception ex) {
+        	throw ex;
+        } finally {
+        	stream.close();
+        	resStreamOut.close();
+        }
 	}
 	
 }

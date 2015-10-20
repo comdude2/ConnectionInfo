@@ -14,5 +14,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libraries/other/MySQL/mysql-connector-java-5.1.36-bin.jar" sourcepath="libraries/other/MySQL/src.zip"/>
+	<classpathentry kind="lib" path="E:/Main Doccuments/Programming/Java/Public Releases/plugins/ComLibrary.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/Matt/git/ComLibrary/doc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

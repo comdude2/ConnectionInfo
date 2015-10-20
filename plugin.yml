@@ -1,0 +1,6 @@
+name: ConnectionInfo
+main: net.comdude2.plugins.connectioninfo.main.ConnectionInfo
+version: 0.0.0.0
+author: comdude2
+description: A Minecraft plugin that monitors client and server connections and records information.
+depend: [ComLibrary]
