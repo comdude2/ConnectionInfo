@@ -8,5 +8,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="E:/Main Doccuments/Programming/Java/spigot/1.8.4 (I think)/spigot_server.jar"/>
+	<classpathentry kind="lib" path="libraries/other/commons-codec/commons-codec-1.9.jar" sourcepath="libraries/other/commons-codec/commons-codec-1.9-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ConnectionInfo/libraries/other/commons-codec/commons-codec-1.9-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libraries/other/MySQL/mysql-connector-java-5.1.36-bin.jar" sourcepath="libraries/other/MySQL/src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
