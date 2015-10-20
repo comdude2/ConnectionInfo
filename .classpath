@@ -2,5 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="E:/Main Doccuments/Programming/Java/spigot/1.8.4 (I think)/craftbukkit_server.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://hub.spigotmc.org/javadocs/bukkit/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="E:/Main Doccuments/Programming/Java/spigot/1.8.4 (I think)/spigot_server.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
