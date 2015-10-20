@@ -20,8 +20,12 @@ Contact: admin@mcviral.net
 
 package net.comdude2.plugins.connectioninfo.main;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 public class Listeners implements Listener{
 	
@@ -39,6 +43,20 @@ public class Listeners implements Listener{
 	public void unregister(){
 		HandlerList.unregisterAll(this);
 		ci.getLogger().info("Events unregistered.");
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled=false)
+	public void onPlayerConnectAttempt(PlayerLoginEvent event){
+		ci.handle.connectionAttempt(event);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerConnect(PlayerLoginEvent event){
+		if (event.getResult().equals(Result.ALLOWED)){
+			ci.handle.newConnection(event);
+		}else{
+			ci.handle.failedConnection(event);
+		}
 	}
 	
 }

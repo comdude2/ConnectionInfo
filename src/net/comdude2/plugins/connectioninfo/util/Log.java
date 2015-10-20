@@ -24,31 +24,33 @@ import java.util.logging.Logger;
 
 public class Log {
 	
+	private String name = null;
 	private Logger mc = null;
 	private net.comdude2.plugins.comlibrary.util.Log log = null;
 	
 	public Log(String name, String path, boolean debug, Logger mc){
+		this.name = name;
 		this.mc = mc;
 		this.log = new net.comdude2.plugins.comlibrary.util.Log(name, path, debug);
 	}
 	
 	public void info(String message){
-		this.log.info(message);
+		this.log.info(me() + message);
 		this.mc.info(message);
 	}
 	
 	public void warning(String message){
-		this.log.warning(message);
+		this.log.warning(me() + message);
 		this.mc.warning(message);
 	}
 	
 	public void severe(String message){
-		this.log.severe(message);
+		this.log.severe(me() + message);
 		this.mc.severe(message);
 	}
 	
 	public void error(String message, Exception e){
-		this.log.error(message, e);
+		this.log.error(me() + message, e);
 		this.mc.severe(message);
 		e.printStackTrace();
 	}
@@ -59,6 +61,10 @@ public class Log {
 	
 	public void debug(String message, Exception e){
 		this.log.debug(message, e);
+	}
+	
+	private String me(){
+		return "[" + name + "] ";
 	}
 	
 }

@@ -20,10 +20,31 @@ Contact: admin@mcviral.net
 
 package net.comdude2.plugins.connectioninfo.net;
 
+import java.net.InetAddress;
+import java.util.UUID;
+
 public class Connection {
 	
-	public Connection(){
-		
+	private UUID uuid = null;
+	private InetAddress address = null;
+	private String hostname = null;
+	
+	public Connection(UUID uuid, InetAddress address, String hostname){
+		this.uuid = uuid;
+		this.address = address;
+		this.hostname = hostname;
+	}
+	
+	public UUID getUUID(){
+		return uuid;
+	}
+	
+	public InetAddress getAddress(){
+		return address;
+	}
+	
+	public String getHostname(){
+		return hostname;
 	}
 	
 }

@@ -24,15 +24,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
 
+import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
 import net.comdude2.plugins.connectioninfo.util.Log;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConnectionInfo extends JavaPlugin{
 	
-	protected Log log = null;
-	protected Listeners listeners = null;
+	public Log log = null;
+	public Listeners listeners = null;
+	public ConnectionHandler handle = null;
 	
 	public void onEnable(){
 		//Initialise log
@@ -45,13 +48,23 @@ public class ConnectionInfo extends JavaPlugin{
 			try{
 				exportResource("LICENCE.txt", f);
 			}catch(Exception e){
-				
+				log.error(e.getMessage(), e);
 				e.printStackTrace();
 			}
 		}
 		
 		//Main
 		listeners = new Listeners(this);
+		handle = new ConnectionHandler(this);
+		LinkedList <Integer> methods = determineLoggingMethods();
+		if (methods != null){
+			for (Integer method : methods){
+				handle.addLoggingMethod(method);
+			}
+		}else{
+			log.warning("");
+		}
+		//Enable
 		listeners.register();
 		log.info("[" + this.getDescription().getName() + "] Version: " + this.getDescription().getVersion() + " is now Enabled!");
 	}
@@ -81,6 +94,22 @@ public class ConnectionInfo extends JavaPlugin{
         	stream.close();
         	resStreamOut.close();
         }
+	}
+	
+	public LinkedList <Integer> determineLoggingMethods(){
+		if (this.getConfig().getBoolean("LoggingMethod.SingleFile")){
+			
+		}
+		if (this.getConfig().getBoolean("LoggingMethod.UUIDFiles")){
+			
+		}
+		if (this.getConfig().getBoolean("LoggingMethod.MYSQL")){
+			
+		}
+		if (this.getConfig().getBoolean("LoggingMethod.MINECRAFTLOG")){
+			
+		}
+		return null;
 	}
 	
 }
