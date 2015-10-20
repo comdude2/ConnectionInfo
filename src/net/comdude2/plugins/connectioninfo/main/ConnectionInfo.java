@@ -25,17 +25,18 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.comdude2.plugins.comlibrary.util.Log;
+import net.comdude2.plugins.connectioninfo.util.Log;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConnectionInfo extends JavaPlugin{
 	
 	protected Log log = null;
+	protected Listeners listeners = null;
 	
 	public void onEnable(){
 		//Initialise log
-		log = new Log(this.getDescription().getName(),this.getDataFolder().getAbsolutePath() + "/",true);
+		log = new Log(this.getDescription().getName(),this.getDataFolder().getAbsolutePath() + "/",true, this.getLogger());
 		
 		// Export licence
 		File path = new File("");
@@ -50,10 +51,14 @@ public class ConnectionInfo extends JavaPlugin{
 		}
 		
 		//Main
+		listeners = new Listeners(this);
+		listeners.register();
+		log.info("[" + this.getDescription().getName() + "] Version: " + this.getDescription().getVersion() + " is now Enabled!");
 	}
 	
 	public void onDisable(){
-		
+		listeners.unregister();
+		log.info("[" + this.getDescription().getName() + "] Version: " + this.getDescription().getVersion() + " is now Disabled!");
 	}
 	
 	private void exportResource(String resourceName, File destination) throws Exception {
