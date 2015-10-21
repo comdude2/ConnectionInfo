@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 
 import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
+import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
 import net.comdude2.plugins.connectioninfo.util.Log;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,14 +42,19 @@ public class ConnectionInfo extends JavaPlugin{
 		//Save default config
 		this.saveDefaultConfig();
 		//Initialise log
-		log = new Log(this.getDescription().getName(),new File(this.getDataFolder().getAbsolutePath() + "/"),true, this.getLogger());
+		File file = new File(this.getDataFolder().getAbsolutePath() + "/plugin_logs/");
+		file.mkdirs();
+		file = new File(this.getDataFolder().getAbsolutePath() + "/plugin_logs/log.txt");
+		try{if(!file.exists()){boolean created = file.createNewFile();if (!created){this.getLogger().warning("Failed to create logger file!");}}
+		log = new Log(this.getDescription().getName(),file,true, this.getLogger());
+		}catch(Exception e){this.getServer().getPluginManager().disablePlugin(this);this.getLogger().severe("Failed to initialise logger.");return;}
 		
 		// Export licence
 		File path = new File("");
 		File f = new File(path.getAbsolutePath() + "ConnectionInfo_Licence.txt");
 		if (!f.exists()){
 			try{
-				exportResource("LICENCE.txt", f);
+				exportResource("/LICENSE.txt", f);
 			}catch(Exception e){
 				log.error(e.getMessage(), e);
 				e.printStackTrace();
@@ -64,16 +70,17 @@ public class ConnectionInfo extends JavaPlugin{
 				handle.addLoggingMethod(method);
 			}
 		}else{
-			log.warning("");
+			log.warning("No logging methods added, connections and attempts will not be logged!");
 		}
+		
 		//Enable
 		listeners.register();
-		log.info("[" + this.getDescription().getName() + "] Version: " + this.getDescription().getVersion() + " is now Enabled!");
+		log.info("Version: " + this.getDescription().getVersion() + " is now Enabled!");
 	}
 	
 	public void onDisable(){
 		listeners.unregister();
-		log.info("[" + this.getDescription().getName() + "] Version: " + this.getDescription().getVersion() + " is now Disabled!");
+		log.info("Version: " + this.getDescription().getVersion() + " is now Disabled!");
 	}
 	
 	private void exportResource(String resourceName, File destination) throws Exception {
@@ -93,25 +100,29 @@ public class ConnectionInfo extends JavaPlugin{
         } catch (Exception ex) {
         	throw ex;
         } finally {
-        	stream.close();
-        	resStreamOut.close();
+        	try{stream.close();}catch(Exception e){}
+        	try{resStreamOut.close();}catch(Exception e){}
         }
 	}
 	
 	public LinkedList <Integer> determineLoggingMethods(){
+		LinkedList <Integer> methods = new LinkedList <Integer> ();
 		if (this.getConfig().getBoolean("LoggingMethod.SingleFile")){
-			
+			methods.add(LoggingMethod.SINGLE_FILE);
 		}
 		if (this.getConfig().getBoolean("LoggingMethod.UUIDFiles")){
-			
+			methods.add(LoggingMethod.UUID_FILES);
 		}
 		if (this.getConfig().getBoolean("LoggingMethod.MYSQL")){
-			
+			methods.add(LoggingMethod.MYSQL);
 		}
 		if (this.getConfig().getBoolean("LoggingMethod.MINECRAFTLOG")){
-			
+			methods.add(LoggingMethod.MINECRAFT_LOG);
 		}
-		return null;
+		if (methods.size() < 1){
+			methods = null;
+		}
+		return methods;
 	}
 	
 }

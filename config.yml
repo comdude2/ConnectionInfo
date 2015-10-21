@@ -1,0 +1,5 @@
+# Connection logging methods
+LoggingMethod.SingleFile: False
+LoggingMethod.UUIDFiles: False
+LoggingMethod.MYSQL: False
+LoggingMethod.MINECRAFTLOG: False
