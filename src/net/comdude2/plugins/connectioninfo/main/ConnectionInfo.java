@@ -22,16 +22,21 @@ package net.comdude2.plugins.connectioninfo.main;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.util.LinkedList;
 
 import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
+import net.comdude2.plugins.connectioninfo.net.GeoIP;
+import net.comdude2.plugins.connectioninfo.net.Location;
 import net.comdude2.plugins.connectioninfo.util.Log;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("unused")
 public class ConnectionInfo extends JavaPlugin{
 	
 	public Log log = null;
@@ -41,6 +46,7 @@ public class ConnectionInfo extends JavaPlugin{
 	public void onEnable(){
 		//Save default config
 		this.saveDefaultConfig();
+		
 		//Initialise log
 		File file = new File(this.getDataFolder().getAbsolutePath() + "/plugin_logs/");
 		file.mkdirs();
@@ -73,8 +79,25 @@ public class ConnectionInfo extends JavaPlugin{
 			log.warning("No logging methods added, connections and attempts will not be logged!");
 		}
 		
+		/*
+		log.info("Attempting to locate IP: 165.120.41.189");
+		try {
+			GeoIP geo = new GeoIP(this, this.getDataFolder() + "/GeoLite2-City.mmdb");
+			InetAddress address = InetAddress.getByName("165.120.41.189");
+			Location l = geo.getLocation(address);
+			if (l != null){
+				log.info("IP Address resolved to: " + l.toString());
+			}else{
+				log.warning("GeoIP Fault.");
+			}
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+		*/
+		
 		//Enable
 		listeners.register();
+		log.info("This plugin includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com");
 		log.info("Version: " + this.getDescription().getVersion() + " is now Enabled!");
 	}
 	
@@ -114,7 +137,12 @@ public class ConnectionInfo extends JavaPlugin{
 			methods.add(LoggingMethod.UUID_FILES);
 		}
 		if (this.getConfig().getBoolean("LoggingMethod.MYSQL")){
-			methods.add(LoggingMethod.MYSQL);
+			if (validDatabaseCredentials()){
+				methods.add(LoggingMethod.MYSQL);
+			}else{
+				this.log.info("Database credentials are not valid, database logging disabled.");
+				//TODO add sync repeating task to display message every few minutes
+			}
 		}
 		if (this.getConfig().getBoolean("LoggingMethod.MINECRAFTLOG")){
 			methods.add(LoggingMethod.MINECRAFT_LOG);
@@ -123,6 +151,30 @@ public class ConnectionInfo extends JavaPlugin{
 			methods = null;
 		}
 		return methods;
+	}
+	
+	public boolean validDatabaseCredentials(){
+		boolean ok = true;
+		if (this.getConfig().getString("Database.Address") != null){
+			if (this.getConfig().getString("Database.Address") == "none"){
+				ok = false;
+			}
+		}else{
+			ok = false;
+		}
+		if (this.getConfig().getString("Database.Username") != null){
+			if (this.getConfig().getString("Database.Username") == "none"){
+				ok = false;
+			}
+		}else{
+			ok = false;
+		}
+		if (this.getConfig().getString("Database.Password") == null){
+			this.getConfig().set("Database.Password", "");
+			this.saveConfig();
+			this.reloadConfig();
+		}
+		return ok;
 	}
 	
 }

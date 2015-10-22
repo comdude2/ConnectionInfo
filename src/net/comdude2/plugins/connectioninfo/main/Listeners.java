@@ -26,6 +26,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Listeners implements Listener{
 	
@@ -57,6 +58,11 @@ public class Listeners implements Listener{
 		}else{
 			ci.handle.failedConnection(event);
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerQuit(PlayerQuitEvent event){
+		ci.handle.endConnection(event);
 	}
 	
 }

@@ -3,3 +3,6 @@ LoggingMethod.SingleFile: False
 LoggingMethod.UUIDFiles: False
 LoggingMethod.MYSQL: False
 LoggingMethod.MINECRAFTLOG: False
+Database.Address: 
+Database.Username: 
+Database.Password: 

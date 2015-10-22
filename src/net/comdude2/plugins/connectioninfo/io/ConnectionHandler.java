@@ -21,20 +21,18 @@ Contact: admin@mcviral.net
 package net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.UUID;
 
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.mysql.jdbc.MySQLConnection;
-import com.mysql.jdbc.PreparedStatement;
-
-import net.comdude2.plugins.comlibrary.database.ConnectionException;
-import net.comdude2.plugins.comlibrary.database.DatabaseConnector;
 import net.comdude2.plugins.comlibrary.util.Log;
 import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
 import net.comdude2.plugins.connectioninfo.net.Connection;
+import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 
 public class ConnectionHandler {
 	
@@ -43,7 +41,6 @@ public class ConnectionHandler {
 	private LinkedList <Connection> connections = new LinkedList <Connection> ();
 	private boolean logConnectionAttempts = true;
 	private Log singleFileLog = null;
-	private DatabaseConnector db = null;
 	
 	public ConnectionHandler(ConnectionInfo ci){
 		this.ci = ci;
@@ -77,6 +74,7 @@ public class ConnectionHandler {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void connectionAttempt(PlayerLoginEvent event){
 		if (this.logConnectionAttempts){
 			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
@@ -92,7 +90,8 @@ public class ConnectionHandler {
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
 				//TODO Add MySQL
-				insertRecord("jdbc:mysql://comdude2.net:3306/", "test", "pieisnice");
+				DatabaseLogger dbl = new DatabaseLogger(ci);
+				ci.getServer().getScheduler().scheduleAsyncDelayedTask(ci, dbl, 20L);
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
 				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "'");
@@ -143,44 +142,59 @@ public class ConnectionHandler {
 		}
 	}
 	
-	//TODO PUT THIS ON A SEPERATE THREAD
-	private void insertRecord(String URL, String username, String password){
-		//NOTE INSERT INTO `test`.`table` (`myKey`, `myValue`) VALUES ('1', 'Test');
-		if (db != null){
-			if (db.getConnection() != null){
-				try {
-					if (!db.getConnection().isClosed()){
-						//Connected
-						db.disconnect();
-					}
-				} catch (SQLException e) {}
+	public void endConnection(PlayerQuitEvent event){
+		Connection connection = getConnection(event.getPlayer().getUniqueId());
+		if (connection != null){
+			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
+				if (this.singleFileLog == null){
+					File f = new File(ci.getDataFolder() + "/connection_logs/connection_log.txt");
+					this.singleFileLog = new Log("Connection_Log", f, true);
+				}
+				//TODO Ensure that getAddress() is the one i need.
+				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED##");
 			}
-		}else{
-			db = new DatabaseConnector(URL);
+			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
+				
+			}
+			if (loggingMethods.contains(LoggingMethod.MYSQL)){
+				//TODO Add MySQL
+			}
+			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
+				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED##");
+			}
 		}
-		try{
-			db.setupConnection(username, password);
-			db.connect();
-			MySQLConnection connection = db.getConnection();
-			PreparedStatement statement = (PreparedStatement) connection.prepareStatement("INSERT INTO `test`.`table` (`myKey`, `myValue`) VALUES (?, ?);");
-			statement.setInt(1, 2);
-			statement.setString(2, "Test");
-			statement.executeUpdate();
-		}catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
-			try{db.disconnect();}catch(Exception e){};
+	}
+	
+	public void endConnection(PlayerKickEvent event){
+		Connection connection = getConnection(event.getPlayer().getUniqueId());
+		if (connection != null){
+			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
+				if (this.singleFileLog == null){
+					File f = new File(ci.getDataFolder() + "/connection_logs/connection_log.txt");
+					this.singleFileLog = new Log("Connection_Log", f, true);
+				}
+				//TODO Ensure that getAddress() is the one i need.
+				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "'");
+			}
+			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
+				
+			}
+			if (loggingMethods.contains(LoggingMethod.MYSQL)){
+				//TODO Add MySQL
+			}
+			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
+				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "'");
+			}
 		}
+	}
+	
+	public Connection getConnection(UUID uuid){
+		for (Connection c : connections){
+			if (c.getUUID().equals(uuid)){
+				return c;
+			}
+		}
+		return null;
 	}
 	
 }

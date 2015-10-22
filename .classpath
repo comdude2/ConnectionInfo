@@ -19,5 +19,11 @@
 			<attribute name="javadoc_location" value="file:/C:/Users/Matt/git/ComLibrary/doc/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libraries/other/MaxMind GEOIP/geoip2-2.3.1.jar" sourcepath="libraries/other/MaxMind GEOIP/geoip2-2.3.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ConnectionInfo/libraries/other/MaxMind%20GEOIP/geoip2-2.3.1-javadoc.jar!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ConnectionInfo/libraries/other/MaxMind GEOIP/dependencies"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
