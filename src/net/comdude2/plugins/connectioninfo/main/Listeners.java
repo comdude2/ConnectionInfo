@@ -24,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -62,6 +63,11 @@ public class Listeners implements Listener{
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerQuit(PlayerQuitEvent event){
+		ci.handle.endConnection(event);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled=true)
+	public void onPlayerKick(PlayerKickEvent event){
 		ci.handle.endConnection(event);
 	}
 	

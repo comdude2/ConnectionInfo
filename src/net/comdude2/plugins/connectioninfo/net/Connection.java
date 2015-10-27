@@ -28,6 +28,7 @@ public class Connection {
 	private UUID uuid = null;
 	private InetAddress address = null;
 	private String hostname = null;
+	private long joinTime = 0L;
 	
 	public Connection(UUID uuid, InetAddress address, String hostname){
 		this.uuid = uuid;
@@ -45,6 +46,10 @@ public class Connection {
 	
 	public String getHostname(){
 		return hostname;
+	}
+	
+	public long getJoinTime(){
+		return joinTime;
 	}
 	
 }

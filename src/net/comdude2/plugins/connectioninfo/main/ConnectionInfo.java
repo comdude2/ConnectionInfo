@@ -30,10 +30,12 @@ import java.util.LinkedList;
 
 import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
+import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 import net.comdude2.plugins.connectioninfo.net.GeoIP;
 import net.comdude2.plugins.connectioninfo.net.Location;
 import net.comdude2.plugins.connectioninfo.util.Log;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
@@ -80,10 +82,10 @@ public class ConnectionInfo extends JavaPlugin{
 		}
 		
 		/*
-		log.info("Attempting to locate IP: 165.120.41.189");
+		log.info("Attempting to locate IP: 0.0.0.0");
 		try {
 			GeoIP geo = new GeoIP(this, this.getDataFolder() + "/GeoLite2-City.mmdb");
-			InetAddress address = InetAddress.getByName("165.120.41.189");
+			InetAddress address = InetAddress.getByName("0.0.0.0");
 			Location l = geo.getLocation(address);
 			if (l != null){
 				log.info("IP Address resolved to: " + l.toString());
@@ -103,6 +105,8 @@ public class ConnectionInfo extends JavaPlugin{
 	
 	public void onDisable(){
 		listeners.unregister();
+		this.getServer().getScheduler().cancelTasks(this);
+		//TODO Add any save data sections here
 		log.info("Version: " + this.getDescription().getVersion() + " is now Disabled!");
 	}
 	
@@ -140,8 +144,16 @@ public class ConnectionInfo extends JavaPlugin{
 			if (validDatabaseCredentials()){
 				methods.add(LoggingMethod.MYSQL);
 			}else{
-				this.log.info("Database credentials are not valid, database logging disabled.");
+				this.log.warning("Database credentials are not valid, database logging disabled.");
 				//TODO add sync repeating task to display message every few minutes
+				this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
+					
+					@Override
+					public void run() {
+						Bukkit.getLogger().warning("[ConnectionInfo] Database credentials are not valid, database logging disabled.");
+					}
+					
+				}, 0L, 1200L);
 			}
 		}
 		if (this.getConfig().getBoolean("LoggingMethod.MINECRAFTLOG")){
@@ -164,6 +176,27 @@ public class ConnectionInfo extends JavaPlugin{
 		}
 		if (this.getConfig().getString("Database.Username") != null){
 			if (this.getConfig().getString("Database.Username") == "none"){
+				ok = false;
+			}
+		}else{
+			ok = false;
+		}
+		if (this.getConfig().getString("Database.Name") != null){
+			if (this.getConfig().getString("Database.Name") == "none"){
+				ok = false;
+			}
+		}else{
+			ok = false;
+		}
+		if (this.getConfig().getString("Database.Connection_log_table_name") != null){
+			if (this.getConfig().getString("Database.Connection_log_table_name") == "none"){
+				ok = false;
+			}
+		}else{
+			ok = false;
+		}
+		if (this.getConfig().getString("Database.Plugin_log_table_name") != null){
+			if (this.getConfig().getString("Database.Plugin_log_table_name") == "none"){
 				ok = false;
 			}
 		}else{

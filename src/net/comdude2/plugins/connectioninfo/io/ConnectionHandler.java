@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import net.comdude2.plugins.comlibrary.util.Log;
 import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
+import net.comdude2.plugins.connectioninfo.misc.SQL;
 import net.comdude2.plugins.connectioninfo.net.Connection;
 import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 
@@ -41,6 +42,7 @@ public class ConnectionHandler {
 	private LinkedList <Connection> connections = new LinkedList <Connection> ();
 	private boolean logConnectionAttempts = true;
 	private Log singleFileLog = null;
+	private DatabaseLogger dbl = null;
 	
 	public ConnectionHandler(ConnectionInfo ci){
 		this.ci = ci;
@@ -90,8 +92,12 @@ public class ConnectionHandler {
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
 				//TODO Add MySQL
-				DatabaseLogger dbl = new DatabaseLogger(ci);
-				ci.getServer().getScheduler().scheduleAsyncDelayedTask(ci, dbl, 20L);
+				if (dbl == null){
+					dbl = new DatabaseLogger(ci);
+					ci.getServer().getScheduler().scheduleAsyncDelayedTask(ci, dbl, 0L);
+				}else{
+					dbl.scheduleSQLExecution(new SQL("INSERT INTO `test`.`table` (`myKey`, `myValue`) VALUES (?, ?);", ci.getConfig().getString("Database.Connection_log_table_name")));
+				}
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
 				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "'");
@@ -163,6 +169,7 @@ public class ConnectionHandler {
 				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED##");
 			}
 		}
+		connections.remove(connection);
 	}
 	
 	public void endConnection(PlayerKickEvent event){
@@ -186,6 +193,7 @@ public class ConnectionHandler {
 				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "'");
 			}
 		}
+		connections.remove(connection);
 	}
 	
 	public Connection getConnection(UUID uuid){

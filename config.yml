@@ -1,8 +1,15 @@
 # Connection logging methods
+
 LoggingMethod.SingleFile: False
 LoggingMethod.UUIDFiles: False
 LoggingMethod.MYSQL: False
 LoggingMethod.MINECRAFTLOG: False
+
+#Database
+
 Database.Address: 
 Database.Username: 
 Database.Password: 
+Database.Name: 
+Database.Connection_log_table_name: 
+Database.Plugin_log_table_name: 
