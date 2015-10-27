@@ -1,28 +1,28 @@
 package net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
+
+import net.comdude2.plugins.comlibrary.util.Log;
+import net.comdude2.plugins.connectioninfo.misc.LogQueue;
+import net.comdude2.plugins.connectioninfo.misc.MessageQueue;
 
 public class FileLogger implements Runnable{
 	
-	//TODO Add synchronisation?
-	private HashMap <UUID, String> queue = new HashMap <UUID, String> ();
+	private Queue <MessageQueue> queue = new ConcurrentLinkedQueue <MessageQueue> ();
+	private Queue <LogQueue> logs = new ConcurrentLinkedQueue <LogQueue> ();
 	private boolean halt = false;
-	private String path = null;
+	private File folder = null;
+	private Logger log = null;
 	
-	//This class will be for threaded file writing for the LoggingMethod.UUID_FILES unless i find a better alternative that can be thread safe.
+	//FIXED I believe this class is now thread safe due to the implementation of ConcurrentLinkedQueue instead of HashMap
 	
-	public FileLogger(String path){
-		this.path = path;
+	public FileLogger(File folder, Logger log){
+		this.folder = folder;
+		this.log = log;
 	}
 	
 	public void halt(){
@@ -30,39 +30,93 @@ public class FileLogger implements Runnable{
 	}
 	
 	public void logMessage(UUID uuid, String message){
-		queue.put(uuid, message);
+		queue.add(new MessageQueue(uuid, message));
+	}
+	
+	public void playerDisconnected(UUID uuid){
+		for (LogQueue q : logs){
+			if (q.getUUID().equals(uuid)){
+				logs.remove(q);
+				return;
+			}
+		}
+	}
+	
+	private boolean logsContains(UUID uuid){
+		for (LogQueue q : logs){
+			if (q.getUUID().equals(uuid)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("unused")
+	private boolean queueContains(UUID uuid){
+		for (MessageQueue q : queue){
+			if (q.getUUID().equals(uuid)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("unused")
+	private MessageQueue getMessageQueue(UUID uuid){
+		for (MessageQueue q : queue){
+			if (q.getUUID().equals(uuid)){
+				return q;
+			}
+		}
+		return null;
+	}
+	
+	private LogQueue getLogQueue(UUID uuid){
+		for (LogQueue q : logs){
+			if (q.getUUID().equals(uuid)){
+				return q;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public void run() {
-		HashMap <UUID,String> localQueue = null;
 		while(!halt){
-			localQueue = queue;
-			queue = new HashMap <UUID,String> ();
-			if (!localQueue.isEmpty()){
-				Set<Entry<UUID, String>> set = localQueue.entrySet();
-				Iterator<Entry<UUID, String>> i = set.iterator();
-				while(i.hasNext()){
-					Map.Entry<UUID, String> entry = (Map.Entry<UUID, String>)i.next();
-					File f = new File(path + entry.getKey().toString() + ".txt");
-					boolean skip = false;
-					if (!f.exists()){
-						try{
-							f.createNewFile();
-						}catch(Exception e){
-							//Drop the message
-							skip = true;
-						}
-					}
-					if (!skip){
-						try {
-							Files.write(Paths.get(f.toURI()), entry.getValue().getBytes(), StandardOpenOption.APPEND);
-						} catch (IOException e) {
-							//Drop the message
-						}
-					}
+			for (MessageQueue m : queue){
+				try{
+					logToFile(m.getUUID(), m.getMessage());
+				}catch(Exception e){
+					log.warning("ERROR: " + e.getMessage() + " CAUSE: " + e.getCause());
+					e.printStackTrace();
 				}
+				try{queue.remove(m);}catch(Exception e){}
 			}
+		}
+	}
+	
+	private void logToFile(UUID uuid, String message) throws Exception{
+		if (!logsContains(uuid)){
+			File f = new File(folder + "/connection_logs/" + uuid.toString() + ".txt");
+			if (!f.exists()){
+				try{f.createNewFile();}catch(Exception e){}
+			}
+			logs.add(new LogQueue(uuid, new Log(uuid.toString(), f, false)));
+		}
+		LogQueue l = getLogQueue(uuid);
+		if (l != null){
+			if (l.getLog() != null){
+				l.getLog().info(message);
+			}else{
+				File f = new File(folder + "/connection_logs/" + uuid.toString() + ".txt");
+				if (!f.exists()){
+					try{f.createNewFile();}catch(Exception e){}
+				}
+				l.setLog(new Log(uuid.toString(), f, false));
+				l.getLog().info(message);
+			}
+		}else{
+			throw new Exception("Unknown reason for LogQueue to be blank :o - Report to developer.");
 		}
 	}
 	
