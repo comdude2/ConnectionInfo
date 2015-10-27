@@ -145,7 +145,6 @@ public class ConnectionInfo extends JavaPlugin{
 				methods.add(LoggingMethod.MYSQL);
 			}else{
 				this.log.warning("Database credentials are not valid, database logging disabled.");
-				//TODO add sync repeating task to display message every few minutes
 				this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 					
 					@Override
