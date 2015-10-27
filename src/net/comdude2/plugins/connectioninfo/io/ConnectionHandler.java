@@ -76,7 +76,6 @@ public class ConnectionHandler {
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void connectionAttempt(PlayerLoginEvent event){
 		if (this.logConnectionAttempts){
 			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
@@ -94,9 +93,9 @@ public class ConnectionHandler {
 				//TODO Add MySQL
 				if (dbl == null){
 					dbl = new DatabaseLogger(ci);
-					ci.getServer().getScheduler().scheduleAsyncDelayedTask(ci, dbl, 0L);
+					ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
 				}else{
-					dbl.scheduleSQLExecution(new SQL("INSERT INTO `test`.`table` (`myKey`, `myValue`) VALUES (?, ?);", ci.getConfig().getString("Database.Connection_log_table_name")));
+					dbl.scheduleSQLExecution(new SQL("INSERT INTO `" + "`.`" + "` (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?);", ci.getConfig().getString("Database.Connection_log_table_name")));
 				}
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){

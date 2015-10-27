@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.mysql.jdbc.PreparedStatement;
 
 import net.comdude2.plugins.comlibrary.database.ConnectionException;
@@ -13,7 +11,7 @@ import net.comdude2.plugins.comlibrary.database.DatabaseConnector;
 import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
 import net.comdude2.plugins.connectioninfo.misc.SQL;
 
-public class DatabaseLogger extends BukkitRunnable{
+public class DatabaseLogger implements Runnable{
 	
 	private ConnectionInfo ci = null;
 	private DatabaseConnector db = null;
@@ -109,18 +107,15 @@ public class DatabaseLogger extends BukkitRunnable{
 		while (!halt){
 			LinkedList <SQL> localSQL = this.sqlToExecute;
 			this.sqlToExecute = new LinkedList <SQL> ();
-			//"INSERT INTO `test`.`table` (`myKey`, `myValue`) VALUES (?, ?);"
 			for (SQL sql : localSQL){
 				insertRecord(sql);
 			}
 		}
 		ci.log.info("Halting DatabaseLogger...");
-		this.cancel();
 		return;
 	}
 	
 	public void insertRecord(SQL sql){
-		//NOTE INSERT INTO `test`.`table` (`myKey`, `myValue`) VALUES ('1', 'Test');
 		if (db != null){
 			if (db.getConnection() != null){
 				try {

@@ -59,10 +59,21 @@ public class ConnectionInfo extends JavaPlugin{
 		
 		// Export licence
 		File path = new File("");
-		File f = new File(path.getAbsolutePath() + "ConnectionInfo_Licence.txt");
+		File f = new File(path.getAbsolutePath() + "/ConnectionInfo_Licence.txt");
 		if (!f.exists()){
 			try{
 				exportResource("/LICENSE.txt", f);
+			}catch(Exception e){
+				log.error(e.getMessage(), e);
+				e.printStackTrace();
+			}
+		}
+		
+		// Export database
+		f = new File(this.getDataFolder() + "/GeoLite2-City.mmdb");
+		if (!f.exists()){
+			try{
+				exportResource("/libraries/other/MaxMind GEOIP/GeoLite2-City.mmdb", f);
 			}catch(Exception e){
 				log.error(e.getMessage(), e);
 				e.printStackTrace();
