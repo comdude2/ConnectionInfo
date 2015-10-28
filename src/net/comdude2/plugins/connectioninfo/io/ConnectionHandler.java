@@ -22,6 +22,7 @@ package net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -182,7 +183,15 @@ public class ConnectionHandler {
 				
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
-				//TODO Add MySQL
+				if (dbl == null){
+					dbl = new DatabaseLogger(ci, ci.getLogger());
+					dbl.setupCredentials();
+					ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
+				}
+				Date date = new Date();
+				date.setTime(connection.getJoinTime());
+				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED## Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'";
+				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + connection.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
 				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED##");
@@ -206,7 +215,15 @@ public class ConnectionHandler {
 				
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
-				//TODO Add MySQL
+				if (dbl == null){
+					dbl = new DatabaseLogger(ci, ci.getLogger());
+					dbl.setupCredentials();
+					ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
+				}
+				Date date = new Date();
+				date.setTime(connection.getJoinTime());
+				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## Reason: " + event.getReason().toString() + " with message: " + event.getLeaveMessage() + " Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'";
+				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + connection.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
 				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "'");

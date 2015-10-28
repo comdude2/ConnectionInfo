@@ -7,7 +7,11 @@ import java.util.concurrent.TimeUnit;
 
 public class UnitConverter {
 	
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS");
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	
+	public static SimpleDateFormat getSDF(){
+		return sdf;
+	}
 	
 	public static String getCurrentDateToString(){
 		return toStringDateFormat(new Date().getTime());
@@ -45,4 +49,55 @@ public class UnitConverter {
 	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
 	}
 	
+	//THIS IS WRONG i know this isn't the best but it will do for now.
+	public static String getDateDiff(Date newer, Date older){
+		try{
+			String snew = sdf.format(newer);
+			String sold = sdf.format(older);
+			int years = ((Integer.parseInt(snew.substring(0,4)) - (Integer.parseInt(sold.substring(0, 4)))));
+			int months = ((Integer.parseInt(snew.substring(5,7)) - (Integer.parseInt(sold.substring(5, 7)))));
+			int days = ((Integer.parseInt(snew.substring(8,10)) - (Integer.parseInt(sold.substring(8, 10)))));
+			int hours = ((Integer.parseInt(snew.substring(11,13)) - (Integer.parseInt(sold.substring(11, 13)))));
+			int minutes = ((Integer.parseInt(snew.substring(14,16)) - (Integer.parseInt(sold.substring(14, 16)))));
+			int seconds = ((Integer.parseInt(snew.substring(17,19)) - (Integer.parseInt(sold.substring(17, 19)))));
+			int milliseconds = ((Integer.parseInt(snew.substring(20,22)) - (Integer.parseInt(sold.substring(20, 22)))));
+			
+			//Check
+			while (years < 0 || months < 0 || days < 0 || hours < 0 || minutes < 0 || seconds < 0 || milliseconds < 0){
+				if (years < 0){
+					//Erm?
+					//Added this to make sure loop doesn't go infinite.
+					years = 0;
+				}
+				if (months < 0){
+					years--;
+					months = 12 + months;
+				}
+				if (days < 0){
+					months--;
+					days = 31 + days;
+				}
+				if (hours < 0){
+					days--;
+					hours = 24 + hours;
+				}
+				if (minutes < 0){
+					hours--;
+					minutes = 60 + minutes;
+				}
+				if (seconds < 0){
+					minutes--;
+					seconds = 60 + seconds;
+				}
+				if (milliseconds < 0){
+					seconds--;
+					milliseconds = 1000 + milliseconds;
+				}
+			}
+			return "Years: " + years + " Months: " + months + " Days: " + days + " Hours: " + hours + " Minutes: " + minutes + " Seconds: " + seconds + " Milliseconds: " + milliseconds;
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

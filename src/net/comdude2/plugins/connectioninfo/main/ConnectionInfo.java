@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.LinkedList;
 
 import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
@@ -34,6 +36,7 @@ import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 import net.comdude2.plugins.connectioninfo.net.GeoIP;
 import net.comdude2.plugins.connectioninfo.net.Location;
 import net.comdude2.plugins.connectioninfo.util.Log;
+import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -114,6 +117,24 @@ public class ConnectionInfo extends JavaPlugin{
 			log.error(e.getMessage(), e);
 		}
 		*/
+		
+		//Test
+		
+		log.info("Testing date difference method...");
+		Date n = new Date();
+		Date o = null;
+		try {
+			o = UnitConverter.getSDF().parse("2011-10-23 12:45:34.432");
+			log.info("Newer date: " + n.getTime() + " Older date: " + o.getTime());
+			String result = UnitConverter.getDateDiff(n, o);
+			log.info("Result: " + result);
+			log.info("Test passed.");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			log.warning("Test failed.");
+		}
+		
 		
 		this.logDatabaseCredentials();
 		
