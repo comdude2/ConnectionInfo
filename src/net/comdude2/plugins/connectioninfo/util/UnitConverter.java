@@ -9,8 +9,12 @@ public class UnitConverter {
 	
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS");
 	
-	public String getCurrentDateToString(){
+	public static String getCurrentDateToString(){
 		return toStringDateFormat(new Date().getTime());
+	}
+	
+	public static long getCurrentTimestamp(){
+		return new Date().getTime();
 	}
 	
 	public static String toStringDateFormat(long l){

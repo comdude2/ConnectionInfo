@@ -2,7 +2,8 @@ package net.comdude2.plugins.connectioninfo.net;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
 
 import com.mysql.jdbc.PreparedStatement;
 
@@ -18,15 +19,20 @@ public class DatabaseLogger implements Runnable{
 	private String URL = null;
 	private String username = null;
 	private String password = null;
+	@SuppressWarnings("unused")
 	private String dbname = null;
 	private String dbconnection_log_table_name = null;
 	private String dbplugin_log_table_name = null;
-	private LinkedList <SQL> sqlToExecute = new LinkedList <SQL> ();
+	private ConcurrentLinkedQueue <SQL> sqlToExecute = new ConcurrentLinkedQueue <SQL> ();
 	private boolean halt = false;
 	private HashMap <String, Integer> tableCounts = new HashMap <String, Integer> ();
+	private Logger log = null;
 	
-	public DatabaseLogger(ConnectionInfo ci){
+	//TODO THIS IS NOT THREAD SAFE! Change HashMap to ConcurrentLinkedQueue!
+	
+	public DatabaseLogger(ConnectionInfo ci, Logger log){
 		this.ci = ci;
+		this.log = log;
 	}
 	
 	public void halt(){
@@ -34,7 +40,8 @@ public class DatabaseLogger implements Runnable{
 	}
 	
 	public void setupCredentials(){
-		this.URL = ("jdbc:mysql://" + ci.getConfig().getString("Database.Address") + "/");
+		//TODO add port support
+		this.URL = ("jdbc:mysql://" + ci.getConfig().getString("Database.Address") + ":3306/" + ci.getConfig().getString("Database.Name"));
 		this.username = ci.getConfig().getString("Database.Username");
 		this.password = ci.getConfig().getString("Database.Password");
 		this.dbname = ci.getConfig().getString("Database.Name");
@@ -43,13 +50,19 @@ public class DatabaseLogger implements Runnable{
 	}
 	
 	public boolean createTableStructure(){
+		ci.log.info("Creating database structure..");
 		boolean perfect = true;
-		if (!tableExists("SELECT COUNT(*) FROM " + this.dbname + "." + this.dbconnection_log_table_name)){
-			try{executeSQL(new SQL("CREATE TABLE connection_log(logID BIGINT, timestamp TIMESTAMP, uuid TINYTEXT, ip VARCHAR(15), message TEXT);", null));}catch(IllegalStateException e){perfect = false;}
+		if (!tableExists("SELECT COUNT(*) FROM " + this.dbconnection_log_table_name + ";")){
+			try{executeSQL(new SQL("CREATE TABLE connection_log(logID BIGINT, timestamp DATETIME, uuid TINYTEXT, ip VARCHAR(15), message TEXT);", null, null));log.info("Table '" + this.dbconnection_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbconnection_log_table_name + "' couldn't be created.");}
+		}else{
+			log.info("Table '" + this.dbconnection_log_table_name + "' exists.");
 		}
-		if (!tableExists("SELECT COUNT(*) FROM " + this.dbname + "." + this.dbplugin_log_table_name)){
-			try{executeSQL(new SQL("CREATE TABLE plugin_log(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null));}catch(IllegalStateException e){perfect = false;}
+		if (!tableExists("SELECT COUNT(*) FROM " + this.dbplugin_log_table_name + ";")){
+			try{executeSQL(new SQL("CREATE TABLE plugin_log(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null, null));log.info("Table '" + this.dbplugin_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbplugin_log_table_name + "' couldn't be created.");}
+		}else{
+			log.info("Table '" + this.dbplugin_log_table_name + "' exists.");
 		}
+		ci.log.info("Finished creating structure.");
 		return perfect;
 	}
 	
@@ -72,7 +85,7 @@ public class DatabaseLogger implements Runnable{
 			}
 		}else{
 			if (URL != null){
-				db = new DatabaseConnector(URL);
+				db = new DatabaseConnector(URL, log);
 			}else{
 				throw new IllegalStateException("URL object is null.");
 			}
@@ -104,12 +117,16 @@ public class DatabaseLogger implements Runnable{
 	
 	@Override
 	public void run(){
-		while (!halt){
-			LinkedList <SQL> localSQL = this.sqlToExecute;
-			this.sqlToExecute = new LinkedList <SQL> ();
-			for (SQL sql : localSQL){
-				insertRecord(sql);
+		boolean created = createTableStructure();
+		if (created){
+			while (!halt){
+				for (SQL sql : sqlToExecute){
+					insertRecord(sql);
+					sqlToExecute.remove(sql);
+				}
 			}
+		}else{
+			ci.log.warning("Failed to create table structure, ending myself...");
 		}
 		ci.log.info("Halting DatabaseLogger...");
 		return;
@@ -127,7 +144,7 @@ public class DatabaseLogger implements Runnable{
 			}
 		}else{
 			if (URL != null){
-				db = new DatabaseConnector(URL);
+				db = new DatabaseConnector(URL, log);
 			}else{
 				throw new IllegalStateException("URL object is null.");
 			}
@@ -136,14 +153,22 @@ public class DatabaseLogger implements Runnable{
 		//Check SQL for ##AUTO## Statements
 		if (sql.getSQL().contains("##AUTO##")){
 			//Replace auto
-			autoIncrement(sql);
+			ci.log.debug("Replacing SQL...");
+			boolean changed = autoIncrement(sql);
+			if (!changed){
+				ci.log.warning("Dropped log with SQL: '" + sql.getSQL() + "' due to autoIncrement() method not changing the value of '##AUTO##'");
+				return;
+			}
 		}
+		
+		ci.log.debug("SQL To Execute: " + sql.getSQL());
 		
 		try{
 			db.setupConnection(username, password);
 			db.connect();
 			com.mysql.jdbc.Connection connection = db.getConnection();
 			PreparedStatement statement = (PreparedStatement) connection.prepareStatement(sql.getSQL());
+			statement.setTimestamp(1, sql.getTimestamp());
 			statement.executeUpdate();
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -164,7 +189,7 @@ public class DatabaseLogger implements Runnable{
 	
 	public boolean tableExists(String sql){
 		try{
-			DatabaseWorker dbw = new DatabaseWorker(ci, sql, URL, username, password);
+			DatabaseWorker dbw = new DatabaseWorker(ci, sql, URL, username, password, log);
 			int count = dbw.getCount();
 			if (count != -1){
 				return true;
@@ -178,7 +203,7 @@ public class DatabaseLogger implements Runnable{
 	
 	public int getRowCount(String sql){
 		try{
-			DatabaseWorker dbw = new DatabaseWorker(ci, sql, URL, username, password);
+			DatabaseWorker dbw = new DatabaseWorker(ci, sql, URL, username, password, log);
 			int count = dbw.getCount();
 			return count;
 		}catch(Exception e){
@@ -191,11 +216,11 @@ public class DatabaseLogger implements Runnable{
 		if (this.tableCounts.containsKey(sql.getTableName())){
 			count = this.tableCounts.get(sql.getTableName()) + 1;
 		}else{
-			count = getRowCount("SELECT COUNT(*) " + sql.getTableName()) + 1;
+			count = getRowCount("SELECT COUNT(*) FROM " + sql.getTableName() + ";") + 1;
 		}
 		if (count != -1){
 			this.tableCounts.put(sql.getTableName(), count);
-			sql.getSQL().replace("##AUTO##", String.valueOf(count + 1));
+			sql.setSQL(sql.getSQL().replace("##AUTO##", String.valueOf(count + 1)));
 			return true;
 		}
 		return false;

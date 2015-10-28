@@ -21,6 +21,7 @@ Contact: admin@mcviral.net
 package net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -34,6 +35,7 @@ import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
 import net.comdude2.plugins.connectioninfo.misc.SQL;
 import net.comdude2.plugins.connectioninfo.net.Connection;
 import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
+import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 public class ConnectionHandler {
 	
@@ -56,6 +58,12 @@ public class ConnectionHandler {
 			f.mkdir();
 		}
 		*/
+	}
+	
+	public void stop(){
+		if (dbl != null){
+			dbl.halt();
+		}
 	}
 	
 	public void setLogConnectionAttempts(boolean state){
@@ -84,22 +92,22 @@ public class ConnectionHandler {
 					this.singleFileLog = new Log("Connection_Log", f, true);
 				}
 				//TODO Ensure that getAddress() is the one i need.
-				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "'");
+				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
 			}
 			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
 				
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
-				//TODO Add MySQL
 				if (dbl == null){
-					dbl = new DatabaseLogger(ci);
+					dbl = new DatabaseLogger(ci, ci.getLogger());
+					dbl.setupCredentials();
 					ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
-				}else{
-					dbl.scheduleSQLExecution(new SQL("INSERT INTO `" + "`.`" + "` (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?);", ci.getConfig().getString("Database.Connection_log_table_name")));
 				}
+				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'";
+				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + event.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
-				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "'");
+				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
 			}
 		}
 	}
@@ -112,16 +120,22 @@ public class ConnectionHandler {
 				this.singleFileLog = new Log("Connection_Log", f, true);
 			}
 			//TODO Ensure that getAddress() is the one i need.
-			this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "'");
+			this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
 		}
 		if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
 			
 		}
 		if (loggingMethods.contains(LoggingMethod.MYSQL)){
-			//TODO Add MySQL
+			if (dbl == null){
+				dbl = new DatabaseLogger(ci, ci.getLogger());
+				dbl.setupCredentials();
+				ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
+			}
+			String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'";
+			dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + event.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 		}
 		if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
-			ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "'");
+			ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
 		}
 	}
 	
@@ -133,16 +147,22 @@ public class ConnectionHandler {
 					this.singleFileLog = new Log("Connection_Log", f, true);
 				}
 				//TODO Ensure that getAddress() is the one i need.
-				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##FAILED## to connect using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "' reason: '" + event.getResult().toString() + "'");
+				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##FAILED## to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "' reason: '" + event.getResult().toString() + "'");
 			}
 			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
 				
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
-				//TODO Add MySQL
+				if (dbl == null){
+					dbl = new DatabaseLogger(ci, ci.getLogger());
+					dbl.setupCredentials();
+					ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
+				}
+				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##FAILED## to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "' reason: '" + event.getResult().toString() + "'";
+				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + event.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
-				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##FAILED## to connect using IP: '" + event.getAddress().getAddress().toString() + "' via: '" + event.getHostname() + "' reason: '" + event.getResult().toString() + "'");
+				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##FAILED## to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "' reason: '" + event.getResult().toString() + "'");
 			}
 		}
 	}

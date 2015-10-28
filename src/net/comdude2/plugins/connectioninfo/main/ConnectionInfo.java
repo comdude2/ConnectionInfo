@@ -88,6 +88,13 @@ public class ConnectionInfo extends JavaPlugin{
 			for (Integer method : methods){
 				handle.addLoggingMethod(method);
 			}
+			boolean logConnectionAttempts = this.getConfig().getBoolean("Database.logConnectionAttempts");
+			if (logConnectionAttempts){
+				this.log.info("Server is logging connection attempts.");
+			}else{
+				this.log.info("Server is not logging connection attempts.");
+			}
+			handle.setLogConnectionAttempts(logConnectionAttempts);
 		}else{
 			log.warning("No logging methods added, connections and attempts will not be logged!");
 		}
@@ -108,6 +115,8 @@ public class ConnectionInfo extends JavaPlugin{
 		}
 		*/
 		
+		this.logDatabaseCredentials();
+		
 		//Enable
 		listeners.register();
 		log.info("This plugin includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com");
@@ -116,6 +125,7 @@ public class ConnectionInfo extends JavaPlugin{
 	
 	public void onDisable(){
 		listeners.unregister();
+		handle.stop();
 		this.getServer().getScheduler().cancelTasks(this);
 		//TODO Add any save data sections here
 		log.info("Version: " + this.getDescription().getVersion() + " is now Disabled!");
@@ -218,6 +228,15 @@ public class ConnectionInfo extends JavaPlugin{
 			this.reloadConfig();
 		}
 		return ok;
+	}
+	
+	public void logDatabaseCredentials(){
+		log.info("URL: " + "jdbc:mysql://" + this.getConfig().getString("Database.Address") + ":3306/" + this.getConfig().getString("Database.Name"));
+		log.info("Username: " + this.getConfig().getString("Database.Username"));
+		log.info("Password: " + this.getConfig().getString("Database.Password"));
+		log.info("DB Name: " + this.getConfig().getString("Database.Name"));
+		log.info("DB Con Table Name: " + this.getConfig().getString("Database.Connection_log_table_name"));
+		log.info("DB Pl Table Name: " + this.getConfig().getString("Database.Plugin_log_table_name"));
 	}
 	
 }

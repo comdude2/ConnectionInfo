@@ -47,7 +47,7 @@ public class Listeners implements Listener{
 		ci.getLogger().info("Events unregistered.");
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled=false)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled=false)
 	public void onPlayerConnectAttempt(PlayerLoginEvent event){
 		ci.handle.connectionAttempt(event);
 	}
