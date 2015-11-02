@@ -47,6 +47,7 @@ public class ConnectionInfo extends JavaPlugin{
 	public Log log = null;
 	public Listeners listeners = null;
 	public ConnectionHandler handle = null;
+	public boolean geoLocation = true;
 	
 	public void onEnable(){
 		//Save default config
@@ -114,6 +115,10 @@ public class ConnectionInfo extends JavaPlugin{
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
+		} catch (NoClassDefFoundError e) {
+			log.severe("Disabling Geo Location!");
+			e.printStackTrace();
+			this.geoLocation = false;
 		}
 		
 		//Test
