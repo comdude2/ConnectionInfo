@@ -102,7 +102,6 @@ public class ConnectionInfo extends JavaPlugin{
 			log.warning("No logging methods added, connections and attempts will not be logged!");
 		}
 		
-		/*
 		log.info("Attempting to locate IP: 0.0.0.0");
 		try {
 			GeoIP geo = new GeoIP(this, this.getDataFolder() + "/GeoLite2-City.mmdb");
@@ -116,7 +115,6 @@ public class ConnectionInfo extends JavaPlugin{
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
-		*/
 		
 		//Test
 		
@@ -189,7 +187,6 @@ public class ConnectionInfo extends JavaPlugin{
 				this.log.warning("Database credentials are not valid, database logging disabled.");
 				this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 					
-					@Override
 					public void run() {
 						Bukkit.getLogger().warning("[ConnectionInfo] Database credentials are not valid, database logging disabled.");
 					}

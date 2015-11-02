@@ -30,10 +30,11 @@ public class Connection {
 	private String hostname = null;
 	private long joinTime = 0L;
 	
-	public Connection(UUID uuid, InetAddress address, String hostname){
+	public Connection(UUID uuid, InetAddress address, String hostname, long jointime){
 		this.uuid = uuid;
 		this.address = address;
 		this.hostname = hostname;
+		this.joinTime = jointime;
 	}
 	
 	public UUID getUUID(){

@@ -115,7 +115,6 @@ public class DatabaseLogger implements Runnable{
 		return false;
 	}
 	
-	@Override
 	public void run(){
 		boolean created = createTableStructure();
 		if (created){

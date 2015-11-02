@@ -80,7 +80,6 @@ public class FileLogger implements Runnable{
 		return null;
 	}
 
-	@Override
 	public void run() {
 		while(!halt){
 			for (MessageQueue m : queue){

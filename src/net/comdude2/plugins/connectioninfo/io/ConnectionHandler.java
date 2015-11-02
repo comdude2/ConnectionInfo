@@ -114,7 +114,8 @@ public class ConnectionHandler {
 	}
 	
 	public void newConnection(PlayerLoginEvent event){
-		connections.add(new Connection(event.getPlayer().getUniqueId(), event.getAddress(), event.getHostname()));
+		Date date = new Date();
+		connections.add(new Connection(event.getPlayer().getUniqueId(), event.getAddress(), event.getHostname(), date.getTime()));
 		if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
 			if (this.singleFileLog == null){
 				File f = new File(ci.getDataFolder() + "/connection_logs/connection_log.txt");
@@ -176,8 +177,9 @@ public class ConnectionHandler {
 					File f = new File(ci.getDataFolder() + "/connection_logs/connection_log.txt");
 					this.singleFileLog = new Log("Connection_Log", f, true);
 				}
-				//TODO Ensure that getAddress() is the one i need.
-				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED##");
+				Date date = new Date();
+				date.setTime(connection.getJoinTime());
+				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED## Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'");
 			}
 			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
 				
@@ -194,10 +196,12 @@ public class ConnectionHandler {
 				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + connection.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
-				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED##");
+				Date date = new Date();
+				date.setTime(connection.getJoinTime());
+				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##DISCONNECTED## Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'");
 			}
+			connections.remove(connection);
 		}
-		connections.remove(connection);
 	}
 	
 	public void endConnection(PlayerKickEvent event){
@@ -208,8 +212,9 @@ public class ConnectionHandler {
 					File f = new File(ci.getDataFolder() + "/connection_logs/connection_log.txt");
 					this.singleFileLog = new Log("Connection_Log", f, true);
 				}
-				//TODO Ensure that getAddress() is the one i need.
-				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "'");
+				Date date = new Date();
+				date.setTime(connection.getJoinTime());
+				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "' Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'");
 			}
 			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
 				
@@ -222,14 +227,16 @@ public class ConnectionHandler {
 				}
 				Date date = new Date();
 				date.setTime(connection.getJoinTime());
-				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## Reason: " + event.getReason().toString() + " with message: " + event.getLeaveMessage() + " Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'";
+				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## Reason: '" + event.getReason().toString() + "' with kick message: '" + event.getLeaveMessage() + "' Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'";
 				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + connection.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
-				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "'");
+				Date date = new Date();
+				date.setTime(connection.getJoinTime());
+				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##KICKED## with reason: '" + event.getReason() + "' with kick message: '" + event.getLeaveMessage() + "' Client was connected for: '" + UnitConverter.getDateDiff(new Date(), date) + "'");
 			}
+			connections.remove(connection);
 		}
-		connections.remove(connection);
 	}
 	
 	public Connection getConnection(UUID uuid){
