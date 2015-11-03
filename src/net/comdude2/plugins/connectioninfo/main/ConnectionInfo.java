@@ -92,7 +92,7 @@ public class ConnectionInfo extends JavaPlugin{
 			for (Integer method : methods){
 				handle.addLoggingMethod(method);
 			}
-			boolean logConnectionAttempts = this.getConfig().getBoolean("Database.logConnectionAttempts");
+			boolean logConnectionAttempts = this.getConfig().getBoolean("logConnectionAttempts");
 			if (logConnectionAttempts){
 				this.log.info("Server is logging connection attempts.");
 			}else{

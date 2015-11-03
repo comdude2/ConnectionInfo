@@ -1,0 +1,22 @@
+# Connection logging methods
+
+LoggingMethod:
+  SingleFile: False
+  UUIDFiles: False
+  MYSQL: False
+  MINECRAFTLOG: True
+
+# Logging variables
+
+logConnectionAttempts: True
+resolveAddresses: True
+
+#Database
+
+Database:
+  Address: 
+  Username: 
+  Password: 
+  Name: connectioninfo
+  Connection_log_table_name: connection_log
+  Plugin_log_table_name: plugin_log
