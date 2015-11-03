@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Contact: admin@mcviral.net
 */
 
-package main.java.net.comdude2.plugins.connectioninfo.main;
+package net.comdude2.plugins.connectioninfo.main;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

@@ -1,4 +1,4 @@
-package main.java.net.comdude2.plugins.connectioninfo.misc;
+package net.comdude2.plugins.connectioninfo.misc;
 
 public class LoggingMethod {
 	

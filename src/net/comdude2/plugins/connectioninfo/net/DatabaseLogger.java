@@ -1,4 +1,4 @@
-package main.java.net.comdude2.plugins.connectioninfo.net;
+package net.comdude2.plugins.connectioninfo.net;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -7,10 +7,10 @@ import java.util.logging.Logger;
 
 import com.mysql.jdbc.PreparedStatement;
 
-import main.java.net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
-import main.java.net.comdude2.plugins.connectioninfo.misc.SQL;
 import net.comdude2.plugins.comlibrary.database.ConnectionException;
 import net.comdude2.plugins.comlibrary.database.DatabaseConnector;
+import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
+import net.comdude2.plugins.connectioninfo.misc.SQL;
 
 public class DatabaseLogger implements Runnable{
 	

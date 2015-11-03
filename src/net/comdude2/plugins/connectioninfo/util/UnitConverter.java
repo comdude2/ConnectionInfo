@@ -1,4 +1,4 @@
-package main.java.net.comdude2.plugins.connectioninfo.util;
+package net.comdude2.plugins.connectioninfo.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

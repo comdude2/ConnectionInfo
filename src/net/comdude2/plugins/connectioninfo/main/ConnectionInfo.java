@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Contact: admin@mcviral.net
 */
 
-package main.java.net.comdude2.plugins.connectioninfo.main;
+package net.comdude2.plugins.connectioninfo.main;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,13 +30,13 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 
-import main.java.net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
-import main.java.net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
-import main.java.net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
-import main.java.net.comdude2.plugins.connectioninfo.net.GeoIP;
-import main.java.net.comdude2.plugins.connectioninfo.net.Location;
-import main.java.net.comdude2.plugins.connectioninfo.util.Log;
-import main.java.net.comdude2.plugins.connectioninfo.util.UnitConverter;
+import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
+import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
+import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
+import net.comdude2.plugins.connectioninfo.net.GeoIP;
+import net.comdude2.plugins.connectioninfo.net.Location;
+import net.comdude2.plugins.connectioninfo.util.Log;
+import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;

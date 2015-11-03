@@ -1,10 +1,10 @@
-package main.java.net.comdude2.plugins.connectioninfo.net;
+package net.comdude2.plugins.connectioninfo.net;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import main.java.net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
+import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
