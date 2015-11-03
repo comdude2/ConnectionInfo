@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Contact: admin@mcviral.net
 */
 
-package net.comdude2.plugins.connectioninfo.util;
+package main.java.net.comdude2.plugins.connectioninfo.util;
 
 import java.io.File;
 import java.util.logging.Logger;

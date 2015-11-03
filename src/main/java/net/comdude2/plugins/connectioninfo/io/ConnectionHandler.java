@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Contact: admin@mcviral.net
 */
 
-package net.comdude2.plugins.connectioninfo.io;
+package main.java.net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
 import java.sql.Timestamp;
@@ -30,13 +30,13 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import main.java.net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
+import main.java.net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
+import main.java.net.comdude2.plugins.connectioninfo.misc.SQL;
+import main.java.net.comdude2.plugins.connectioninfo.net.Connection;
+import main.java.net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
+import main.java.net.comdude2.plugins.connectioninfo.util.UnitConverter;
 import net.comdude2.plugins.comlibrary.util.Log;
-import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
-import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
-import net.comdude2.plugins.connectioninfo.misc.SQL;
-import net.comdude2.plugins.connectioninfo.net.Connection;
-import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
-import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 public class ConnectionHandler {
 	

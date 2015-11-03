@@ -1,4 +1,4 @@
-package net.comdude2.plugins.connectioninfo.net;
+package main.java.net.comdude2.plugins.connectioninfo.net;
 
 /*
  * 	Taken from: https://github.com/Albaniusz/java_mkyong/blob/master/src/main/java/com/mkyong/analysis/location/mode/ServerLocation.java

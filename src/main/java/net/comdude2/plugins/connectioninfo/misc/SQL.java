@@ -1,4 +1,4 @@
-package net.comdude2.plugins.connectioninfo.misc;
+package main.java.net.comdude2.plugins.connectioninfo.misc;
 
 import java.sql.Timestamp;
 

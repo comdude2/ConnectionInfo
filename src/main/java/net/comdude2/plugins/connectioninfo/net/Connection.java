@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Contact: admin@mcviral.net
 */
 
-package net.comdude2.plugins.connectioninfo.net;
+package main.java.net.comdude2.plugins.connectioninfo.net;
 
 import java.net.InetAddress;
 import java.util.UUID;

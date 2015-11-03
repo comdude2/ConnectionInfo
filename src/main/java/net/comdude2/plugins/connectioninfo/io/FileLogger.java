@@ -1,4 +1,4 @@
-package net.comdude2.plugins.connectioninfo.io;
+package main.java.net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
 import java.util.Queue;
@@ -6,9 +6,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
+import main.java.net.comdude2.plugins.connectioninfo.misc.LogQueue;
+import main.java.net.comdude2.plugins.connectioninfo.misc.MessageQueue;
 import net.comdude2.plugins.comlibrary.util.Log;
-import net.comdude2.plugins.connectioninfo.misc.LogQueue;
-import net.comdude2.plugins.connectioninfo.misc.MessageQueue;
 
 public class FileLogger implements Runnable{
 	

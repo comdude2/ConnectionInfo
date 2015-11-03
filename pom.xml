@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ConnectionInfo</groupId>
   <artifactId>ConnectionInfo</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.5.12</version>
   <name>ConnectionInfo</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -21,9 +21,17 @@
   	<dependency>
   		<groupId>com.maxmind.geoip2</groupId>
   		<artifactId>geoip2</artifactId>
-  		<version>2.3.1</version>
   	</dependency>
   </dependencies>
   <url>https://github.com/comdude2/ConnectionInfo</url>
   <description>A Minecraft plugin that monitors client and server connections and records information.</description>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>com.maxmind.geoip2</groupId>
+  			<artifactId>geoip2</artifactId>
+  			<version>2.3.1</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
 </project>
