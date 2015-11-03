@@ -103,24 +103,6 @@ public class ConnectionInfo extends JavaPlugin{
 			log.warning("No logging methods added, connections and attempts will not be logged!");
 		}
 		
-		log.info("Attempting to locate IP: 0.0.0.0");
-		try {
-			GeoIP geo = new GeoIP(this, this.getDataFolder() + "/GeoLite2-City.mmdb");
-			InetAddress address = InetAddress.getByName("0.0.0.0");
-			Location l = geo.getLocation(address);
-			if (l != null){
-				log.info("IP Address resolved to: " + l.toString());
-			}else{
-				log.warning("GeoIP Fault.");
-			}
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		} catch (NoClassDefFoundError e) {
-			log.severe("Disabling Geo Location!");
-			e.printStackTrace();
-			this.geoLocation = false;
-		}
-		
 		//Test
 		log.info("Testing date difference method...");
 		Date n = new Date();

@@ -21,6 +21,8 @@ Contact: admin@mcviral.net
 package net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.LinkedList;
@@ -36,6 +38,9 @@ import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
 import net.comdude2.plugins.connectioninfo.misc.SQL;
 import net.comdude2.plugins.connectioninfo.net.Connection;
 import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
+import net.comdude2.plugins.connectioninfo.net.GeoIP;
+import net.comdude2.plugins.connectioninfo.net.Location;
+import net.comdude2.plugins.connectioninfo.net.UnacceptableAddressException;
 import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 public class ConnectionHandler {
@@ -123,6 +128,25 @@ public class ConnectionHandler {
 			}
 			//TODO Ensure that getAddress() is the one i need.
 			this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
+			String ip = event.getAddress().getHostAddress();
+			ci.log.debug("Attempting to locate IP: " + ip);
+			try {
+				GeoIP geo = new GeoIP(ci, ci.getDataFolder() + "/GeoLite2-City.mmdb");
+				InetAddress address = InetAddress.getByName(ip);
+				Location l = geo.getLocation(address);
+				String msg;
+				if (l != null){
+					msg = "Client with UUID: " + event.getPlayer().getUniqueId().toString() + " IP Address resolved to: " + l.toString();
+					ci.log.debug(msg);
+				}else{
+					msg = "Failed to resolve location.";
+					ci.log.debug(msg);
+				}
+			} catch (IOException e) {
+				ci.log.error(e.getMessage(), e);
+			} catch (UnacceptableAddressException e) {
+				ci.log.error(e.getMessage(), e);
+			}
 		}
 		if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
 			
@@ -135,9 +159,46 @@ public class ConnectionHandler {
 			}
 			String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'";
 			dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + event.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
+			String ip = event.getAddress().getHostAddress();
+			ci.log.debug("Attempting to locate IP: " + ip);
+			try {
+				GeoIP geo = new GeoIP(ci, ci.getDataFolder() + "/GeoLite2-City.mmdb");
+				InetAddress address = InetAddress.getByName(ip);
+				Location l = geo.getLocation(address);
+				if (l != null){
+					msg = "Client with UUID: " + event.getPlayer().getUniqueId().toString() + " IP Address resolved to: " + l.toString();
+					ci.log.debug(msg);
+				}else{
+					msg = "Failed to resolve location.";
+					ci.log.debug(msg);
+				}
+			} catch (IOException e) {
+				ci.log.error(e.getMessage(), e);
+			} catch (UnacceptableAddressException e) {
+				ci.log.error(e.getMessage(), e);
+			}
 		}
 		if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
 			ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' ##SUCCESSFULLY## connected using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
+			String ip = event.getAddress().getHostAddress();
+			ci.log.debug("Attempting to locate IP: " + ip);
+			try {
+				GeoIP geo = new GeoIP(ci, ci.getDataFolder() + "/GeoLite2-City.mmdb");
+				InetAddress address = InetAddress.getByName(ip);
+				Location l = geo.getLocation(address);
+				String msg;
+				if (l != null){
+					msg = "Client with UUID: " + event.getPlayer().getUniqueId().toString() + " IP Address resolved to: " + l.toString();
+					ci.log.info(msg);
+				}else{
+					msg = "Failed to resolve location.";
+					ci.log.info(msg);
+				}
+			} catch (IOException e) {
+				ci.log.error(e.getMessage(), e);
+			} catch (UnacceptableAddressException e) {
+				ci.log.error(e.getMessage(), e);
+			}
 		}
 	}
 	
