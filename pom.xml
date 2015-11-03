@@ -16,6 +16,16 @@
         </configuration>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+          <filtering>true</filtering>
+            <includes>
+              <include>plugin.yml</include>
+              <include>config.yml</include>
+            </includes>
+      </resource>
+    </resources>
   </build>
   <dependencies>
   	<dependency>
