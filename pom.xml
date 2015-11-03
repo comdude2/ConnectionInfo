@@ -4,7 +4,22 @@
   <artifactId>ConnectionInfo</artifactId>
   <version>0.5.12</version>
   <name>ConnectionInfo</name>
+  
+  <developers>
+    <developer>
+      <id>comdude2</id>
+      <name>Matt Armer</name>
+      <email>matt.armer@yahoo.com</email>
+      <url>http://github.com/comdude2</url>
+      <roles>
+        <role>developer</role>
+        <role>maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+  
   <build>
+    <finalName>${project.name}</finalName>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
@@ -13,6 +28,23 @@
         <configuration>
           <source/>
           <target/>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
       </plugin>
     </plugins>
@@ -24,6 +56,10 @@
         <includes>
           <include>plugin.yml</include>
           <include>config.yml</include>
+          <include>README.md</include>
+          <include>LICENSE.txt</include>
+          <include>notes.txt</include>
+          <include>libraries/</include>
         </includes>
       </resource>
     </resources>
@@ -32,17 +68,10 @@
   	<dependency>
   		<groupId>com.maxmind.geoip2</groupId>
   		<artifactId>geoip2</artifactId>
+  		<version>2.3.1</version>
+  		<scope>compile</scope>
   	</dependency>
   </dependencies>
   <url>https://github.com/comdude2/ConnectionInfo</url>
   <description>A Minecraft plugin that monitors client and server connections and records information.</description>
-  <dependencyManagement>
-  	<dependencies>
-  		<dependency>
-  			<groupId>com.maxmind.geoip2</groupId>
-  			<artifactId>geoip2</artifactId>
-  			<version>2.3.1</version>
-  		</dependency>
-  	</dependencies>
-  </dependencyManagement>
 </project>
