@@ -2,8 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ConnectionInfo</groupId>
   <artifactId>ConnectionInfo</artifactId>
-  <version>0.5.12</version>
+  <version>1.2.24</version>
   <name>ConnectionInfo</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <url>http://github.com/comdude2/ConnectionInfo</url>
   
   <developers>
     <developer>
@@ -60,6 +64,7 @@
           <include>LICENSE.txt</include>
           <include>notes.txt</include>
           <include>libraries/</include>
+          <include>pom.xml</include>
         </includes>
       </resource>
     </resources>
@@ -72,6 +77,10 @@
   		<scope>compile</scope>
   	</dependency>
   </dependencies>
-  <url>https://github.com/comdude2/ConnectionInfo</url>
   <description>A Minecraft plugin that monitors client and server connections and records information.</description>
+  <scm>
+  	<connection>scm:git:git://github.com/comdude2/ConnectionInfo.git</connection>
+  	<developerConnection>scm:git:git@github.com:comdude2/ConnectionInfo.git</developerConnection>
+  	<url>https://github.com/comdude2/ConnectionInfo</url>
+  </scm>
 </project>
