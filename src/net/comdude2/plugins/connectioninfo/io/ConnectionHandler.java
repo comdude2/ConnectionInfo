@@ -50,6 +50,7 @@ public class ConnectionHandler {
 	private LinkedList <Integer> loggingMethods = new LinkedList <Integer> ();
 	private LinkedList <Connection> connections = new LinkedList <Connection> ();
 	private boolean logConnectionAttempts = true;
+	private boolean logServerPings = true;
 	private Log singleFileLog = null;
 	private DatabaseLogger dbl = null;
 	
@@ -77,6 +78,10 @@ public class ConnectionHandler {
 		this.logConnectionAttempts = state;
 	}
 	
+	public void setLogServerPings(boolean state){
+		this.logServerPings = state;
+	}
+	
 	public LinkedList <Integer> getLoggingMethods(){
 		return loggingMethods;
 	}
@@ -91,8 +96,25 @@ public class ConnectionHandler {
 		}
 	}
 	
+	//TODO Changes needed
+	@Deprecated
+	@SuppressWarnings("unused")
 	public void serverListPing(ServerListPingEvent event){
-		
+		if(this.logServerPings && false){
+			String msg = "";
+			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
+				
+			}
+			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
+				
+			}
+			if (loggingMethods.contains(LoggingMethod.MYSQL)){
+				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (hostname, count) VALUES ('" + event.getAddress() + "', ##AUTO##);", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
+			}
+			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
+				ci.log.info(msg);
+			}
+		}
 	}
 	
 	public void connectionAttempt(PlayerLoginEvent event){

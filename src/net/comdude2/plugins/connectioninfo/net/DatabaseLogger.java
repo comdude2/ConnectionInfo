@@ -62,10 +62,10 @@ public class DatabaseLogger implements Runnable{
 		if (!tableExists("SELECT COUNT(*) FROM " + this.dbplugin_log_table_name + ";")){
 			try{executeSQL(new SQL("CREATE TABLE " + this.dbplugin_log_table_name + "(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null, null));log.info("Table '" + this.dbplugin_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbplugin_log_table_name + "' couldn't be created.");}
 		}else{
-			log.info("Table '" + this.dbhostname_log_table_name + "' exists.");
+			log.info("Table '" + this.dbplugin_log_table_name + "' exists.");
 		}
 		if (!tableExists("SELECT COUNT(*) FROM " + this.dbhostname_log_table_name + ";")){
-			try{executeSQL(new SQL("CREATE TABLE " + this.dbhostname_log_table_name + "(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null, null));log.info("Table '" + this.dbplugin_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbplugin_log_table_name + "' couldn't be created.");}
+			try{executeSQL(new SQL("CREATE TABLE " + this.dbhostname_log_table_name + "(hostname TINYTEXT, count BIGINT UNSIGNED);", null, null));log.info("Table '" + this.dbhostname_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbhostname_log_table_name + "' couldn't be created.");}
 		}else{
 			log.info("Table '" + this.dbhostname_log_table_name + "' exists.");
 		}
@@ -174,7 +174,9 @@ public class DatabaseLogger implements Runnable{
 			db.connect();
 			com.mysql.jdbc.Connection connection = db.getConnection();
 			PreparedStatement statement = (PreparedStatement) connection.prepareStatement(sql.getSQL());
-			statement.setTimestamp(1, sql.getTimestamp());
+			if (sql.getTimestamp() != null){
+				statement.setTimestamp(1, sql.getTimestamp());
+			}
 			statement.executeUpdate();
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block

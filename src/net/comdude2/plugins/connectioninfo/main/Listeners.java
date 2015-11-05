@@ -72,6 +72,7 @@ public class Listeners implements Listener{
 		ci.handle.endConnection(event);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onServerListPing(ServerListPingEvent event){
 		ci.handle.serverListPing(event);
