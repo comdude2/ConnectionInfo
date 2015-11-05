@@ -31,6 +31,7 @@ import java.util.UUID;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 
 import net.comdude2.plugins.comlibrary.util.Log;
 import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
@@ -90,6 +91,10 @@ public class ConnectionHandler {
 		}
 	}
 	
+	public void serverListPing(ServerListPingEvent event){
+		
+	}
+	
 	public void connectionAttempt(PlayerLoginEvent event){
 		if (this.logConnectionAttempts){
 			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
@@ -146,7 +151,7 @@ public class ConnectionHandler {
 				} catch (IOException e) {
 					ci.log.error(e.getMessage(), e);
 				} catch (UnacceptableAddressException e) {
-					ci.log.error(e.getMessage(), e);
+					ci.log.warning("Couldn't resolve geolocation of Client with UUID: " + event.getPlayer().getUniqueId().toString() + " because they're on a local / loopback address.");
 				}
 			}
 		}
@@ -178,7 +183,7 @@ public class ConnectionHandler {
 				} catch (IOException e) {
 					ci.log.error(e.getMessage(), e);
 				} catch (UnacceptableAddressException e) {
-					ci.log.error(e.getMessage(), e);
+					ci.log.warning("Couldn't resolve geolocation of Client with UUID: " + event.getPlayer().getUniqueId().toString() + " because they're on a local / loopback address.");
 				}
 			}
 		}
@@ -202,7 +207,7 @@ public class ConnectionHandler {
 				} catch (IOException e) {
 					ci.log.error(e.getMessage(), e);
 				} catch (UnacceptableAddressException e) {
-					ci.log.error(e.getMessage(), e);
+					ci.log.warning("Couldn't resolve geolocation of Client with UUID: " + event.getPlayer().getUniqueId().toString() + " because they're on a local / loopback address.");
 				}
 			}
 		}

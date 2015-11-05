@@ -23,6 +23,7 @@ public class DatabaseLogger implements Runnable{
 	private String dbname = null;
 	private String dbconnection_log_table_name = null;
 	private String dbplugin_log_table_name = null;
+	private String dbhostname_log_table_name = null;
 	private ConcurrentLinkedQueue <SQL> sqlToExecute = new ConcurrentLinkedQueue <SQL> ();
 	private boolean halt = false;
 	private HashMap <String, Integer> tableCounts = new HashMap <String, Integer> ();
@@ -47,20 +48,26 @@ public class DatabaseLogger implements Runnable{
 		this.dbname = ci.getConfig().getString("Database.Name");
 		this.dbconnection_log_table_name = ci.getConfig().getString("Database.Connection_log_table_name");
 		this.dbplugin_log_table_name = ci.getConfig().getString("Database.Plugin_log_table_name");
+		this.dbhostname_log_table_name = ci.getConfig().getString("Database.Hostname_log_table_name");
 	}
 	
 	public boolean createTableStructure(){
 		ci.log.info("Creating database structure..");
 		boolean perfect = true;
 		if (!tableExists("SELECT COUNT(*) FROM " + this.dbconnection_log_table_name + ";")){
-			try{executeSQL(new SQL("CREATE TABLE connection_log(logID BIGINT, timestamp DATETIME, uuid TINYTEXT, ip VARCHAR(15), message TEXT);", null, null));log.info("Table '" + this.dbconnection_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbconnection_log_table_name + "' couldn't be created.");}
+			try{executeSQL(new SQL("CREATE TABLE " + this.dbconnection_log_table_name + "(logID BIGINT, timestamp DATETIME, uuid TINYTEXT, ip VARCHAR(15), message TEXT);", null, null));log.info("Table '" + this.dbconnection_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbconnection_log_table_name + "' couldn't be created.");}
 		}else{
 			log.info("Table '" + this.dbconnection_log_table_name + "' exists.");
 		}
 		if (!tableExists("SELECT COUNT(*) FROM " + this.dbplugin_log_table_name + ";")){
-			try{executeSQL(new SQL("CREATE TABLE plugin_log(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null, null));log.info("Table '" + this.dbplugin_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbplugin_log_table_name + "' couldn't be created.");}
+			try{executeSQL(new SQL("CREATE TABLE " + this.dbplugin_log_table_name + "(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null, null));log.info("Table '" + this.dbplugin_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbplugin_log_table_name + "' couldn't be created.");}
 		}else{
-			log.info("Table '" + this.dbplugin_log_table_name + "' exists.");
+			log.info("Table '" + this.dbhostname_log_table_name + "' exists.");
+		}
+		if (!tableExists("SELECT COUNT(*) FROM " + this.dbhostname_log_table_name + ";")){
+			try{executeSQL(new SQL("CREATE TABLE " + this.dbhostname_log_table_name + "(logID BIGINT, timestamp TIMESTAMP, message TEXT);", null, null));log.info("Table '" + this.dbplugin_log_table_name + "' created.");}catch(IllegalStateException e){perfect = false;log.info("Table '" + this.dbplugin_log_table_name + "' couldn't be created.");}
+		}else{
+			log.info("Table '" + this.dbhostname_log_table_name + "' exists.");
 		}
 		ci.log.info("Finished creating structure.");
 		return perfect;

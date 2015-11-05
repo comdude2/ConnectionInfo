@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 
 public class Listeners implements Listener{
 	
@@ -69,6 +70,11 @@ public class Listeners implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled=true)
 	public void onPlayerKick(PlayerKickEvent event){
 		ci.handle.endConnection(event);
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onServerListPing(ServerListPingEvent event){
+		ci.handle.serverListPing(event);
 	}
 	
 }
