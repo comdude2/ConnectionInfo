@@ -96,7 +96,10 @@ public class ConnectionHandler {
 		}
 	}
 	
-	//TODO Changes needed
+	/*
+	 * TODO Changes needed - This is here in case someone wants to log the amount of people that have their server in
+	 * their server list.
+	*/
 	@Deprecated
 	@SuppressWarnings("unused")
 	public void serverListPing(ServerListPingEvent event){
