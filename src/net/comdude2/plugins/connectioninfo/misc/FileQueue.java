@@ -24,12 +24,12 @@ import java.util.UUID;
 
 import net.comdude2.plugins.comlibrary.util.Log;
 
-public class LogQueue {
+public class FileQueue {
 	
 	private UUID uuid = null;
 	private Log log = null;
 	
-	public LogQueue(UUID uuid, Log log){
+	public FileQueue(UUID uuid, Log log){
 		this.uuid = uuid;
 		this.log = log;
 	}

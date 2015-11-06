@@ -24,23 +24,22 @@ import java.io.File;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Logger;
 
 import net.comdude2.plugins.comlibrary.util.Log;
-import net.comdude2.plugins.connectioninfo.misc.LogQueue;
+import net.comdude2.plugins.connectioninfo.misc.FileQueue;
 import net.comdude2.plugins.connectioninfo.misc.MessageQueue;
 
 public class FileLogger implements Runnable{
 	
 	private Queue <MessageQueue> queue = new ConcurrentLinkedQueue <MessageQueue> ();
-	private Queue <LogQueue> logs = new ConcurrentLinkedQueue <LogQueue> ();
+	private Queue <FileQueue> logs = new ConcurrentLinkedQueue <FileQueue> ();
 	private boolean halt = false;
 	private File folder = null;
-	private Logger log = null;
+	private Log log = null;
 	
 	//FIXED I believe this class is now thread safe due to the implementation of ConcurrentLinkedQueue instead of HashMap
 	
-	public FileLogger(File folder, Logger log){
+	public FileLogger(File folder, Log log){
 		this.folder = folder;
 		this.log = log;
 	}
@@ -54,7 +53,7 @@ public class FileLogger implements Runnable{
 	}
 	
 	public void playerDisconnected(UUID uuid){
-		for (LogQueue q : logs){
+		for (FileQueue q : logs){
 			if (q.getUUID().equals(uuid)){
 				logs.remove(q);
 				return;
@@ -63,7 +62,7 @@ public class FileLogger implements Runnable{
 	}
 	
 	private boolean logsContains(UUID uuid){
-		for (LogQueue q : logs){
+		for (FileQueue q : logs){
 			if (q.getUUID().equals(uuid)){
 				return true;
 			}
@@ -91,8 +90,8 @@ public class FileLogger implements Runnable{
 		return null;
 	}
 	
-	private LogQueue getLogQueue(UUID uuid){
-		for (LogQueue q : logs){
+	private FileQueue getLogQueue(UUID uuid){
+		for (FileQueue q : logs){
 			if (q.getUUID().equals(uuid)){
 				return q;
 			}
@@ -120,9 +119,9 @@ public class FileLogger implements Runnable{
 			if (!f.exists()){
 				try{f.createNewFile();}catch(Exception e){}
 			}
-			logs.add(new LogQueue(uuid, new Log(uuid.toString(), f, false)));
+			logs.add(new FileQueue(uuid, new Log(uuid.toString(), f, false)));
 		}
-		LogQueue l = getLogQueue(uuid);
+		FileQueue l = getLogQueue(uuid);
 		if (l != null){
 			if (l.getLog() != null){
 				l.getLog().info(message);
