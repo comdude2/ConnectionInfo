@@ -22,28 +22,28 @@ package net.comdude2.plugins.connectioninfo.misc;
 
 import java.util.UUID;
 
-import net.comdude2.plugins.comlibrary.util.Log;
+import net.comdude2.plugins.connectioninfo.io.UUIDFile;
 
 public class FileQueue {
 	
 	private UUID uuid = null;
-	private Log log = null;
+	private UUIDFile file = null;
 	
-	public FileQueue(UUID uuid, Log log){
+	public FileQueue(UUID uuid, UUIDFile file){
 		this.uuid = uuid;
-		this.log = log;
+		this.file = file;
 	}
 	
 	public UUID getUUID(){
 		return this.uuid;
 	}
 	
-	public Log getLog(){
-		return this.log;
+	public UUIDFile getFile(){
+		return this.file;
 	}
 	
-	public void setLog(Log log){
-		this.log = log;
+	public void setFile(UUIDFile log){
+		this.file = log;
 	}
 	
 }

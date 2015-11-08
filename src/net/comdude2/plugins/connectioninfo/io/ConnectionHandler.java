@@ -37,6 +37,7 @@ import net.comdude2.plugins.comlibrary.util.Log;
 import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
 import net.comdude2.plugins.connectioninfo.misc.SQL;
+import net.comdude2.plugins.connectioninfo.misc.Variable;
 import net.comdude2.plugins.connectioninfo.net.Connection;
 import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 import net.comdude2.plugins.connectioninfo.net.GeoIP;
@@ -53,6 +54,7 @@ public class ConnectionHandler {
 	private boolean logServerPings = true;
 	private Log singleFileLog = null;
 	private DatabaseLogger dbl = null;
+	private FileLogger fl = null;
 	
 	public ConnectionHandler(ConnectionInfo ci){
 		this.ci = ci;
@@ -66,11 +68,20 @@ public class ConnectionHandler {
 			f.mkdir();
 		}
 		*/
+		
+		//Register debugger variables
+		ci.debugger.registerVariable(new Variable("logConnectionAttempts",logConnectionAttempts,this.getClass().getName()));
+		ci.debugger.registerVariable(new Variable("logServerPings",logServerPings,this.getClass().getName()));
+		ci.debugger.registerVariable(new Variable("loggingMethods",loggingMethods,this.getClass().getName()));
+		ci.debugger.registerVariable(new Variable("connections",connections,this.getClass().getName()));
 	}
 	
 	public void stop(){
 		if (dbl != null){
 			dbl.halt();
+		}
+		if (fl != null){
+			fl.halt();
 		}
 	}
 	
@@ -94,6 +105,10 @@ public class ConnectionHandler {
 		if (!loggingMethods.contains(method)){
 			loggingMethods.add(method);
 		}
+	}
+	
+	public FileLogger getFileLogger(){
+		return fl;
 	}
 	
 	/*
@@ -122,16 +137,21 @@ public class ConnectionHandler {
 	
 	public void connectionAttempt(PlayerLoginEvent event){
 		if (this.logConnectionAttempts){
+			String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'";
 			if (loggingMethods.contains(LoggingMethod.SINGLE_FILE)){
 				if (this.singleFileLog == null){
 					File f = new File(ci.getDataFolder() + "/connection_logs/connection_log.txt");
 					this.singleFileLog = new Log("Connection_Log", f, true);
 				}
-				//TODO Ensure that getAddress() is the one i need.
-				this.singleFileLog.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
+				//TODO Copy the old log file.
+				this.singleFileLog.info(msg);
 			}
 			if (loggingMethods.contains(LoggingMethod.UUID_FILES)){
-				
+				if (fl == null){
+					fl = new FileLogger(new File(ci.getDataFolder() + "/connection_logs/"), ci);
+					ci.getServer().getScheduler().runTaskAsynchronously(ci, fl.getFileQueueManager());
+				}
+				fl.logMessage(event.getPlayer().getUniqueId(), msg);
 			}
 			if (loggingMethods.contains(LoggingMethod.MYSQL)){
 				if (dbl == null){
@@ -139,11 +159,10 @@ public class ConnectionHandler {
 					dbl.setupCredentials();
 					ci.getServer().getScheduler().runTaskLaterAsynchronously(ci, dbl, 0L);
 				}
-				String msg = "Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'";
 				dbl.scheduleSQLExecution(new SQL("INSERT INTO " + ci.getConfig().getString("Database.Connection_log_table_name") + " (logID, timestamp, uuid, ip, message) VALUES (##AUTO##, ?, '" + event.getPlayer().getUniqueId().toString() + "', '" + event.getAddress().getHostAddress().toString() + "', '" + msg.replace("'", "") + "');", ci.getConfig().getString("Database.Connection_log_table_name"), new Timestamp(UnitConverter.getCurrentTimestamp())));
 			}
 			if (loggingMethods.contains(LoggingMethod.MINECRAFT_LOG)){
-				ci.log.info("Client with UUID: '" + event.getPlayer().getUniqueId().toString() + "' is attempting to connect using IP: '" + event.getAddress().getHostAddress().toString() + "' via: '" + event.getHostname() + "'");
+				ci.log.info(msg);
 			}
 		}
 	}

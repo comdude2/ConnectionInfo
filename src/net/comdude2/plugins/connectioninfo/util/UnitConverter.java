@@ -120,4 +120,11 @@ public class UnitConverter {
 		}
 		return null;
 	}
+	
+	public static long getMillisecondsSinceTime(long time){
+		long now = new Date().getTime();
+		long diffInMillies = now - time;
+		TimeUnit tu = TimeUnit.MILLISECONDS;
+	    return tu.convert(diffInMillies,TimeUnit.MILLISECONDS);
+	}
 }

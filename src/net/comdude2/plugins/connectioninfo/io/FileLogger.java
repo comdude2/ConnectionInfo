@@ -21,31 +21,46 @@ Contact: admin@mcviral.net
 package net.comdude2.plugins.connectioninfo.io;
 
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import net.comdude2.plugins.comlibrary.util.Log;
+import net.comdude2.plugins.connectioninfo.main.ConnectionInfo;
 import net.comdude2.plugins.connectioninfo.misc.FileQueue;
 import net.comdude2.plugins.connectioninfo.misc.MessageQueue;
+import net.comdude2.plugins.connectioninfo.misc.Variable;
 
 public class FileLogger implements Runnable{
 	
 	private Queue <MessageQueue> queue = new ConcurrentLinkedQueue <MessageQueue> ();
-	private Queue <FileQueue> logs = new ConcurrentLinkedQueue <FileQueue> ();
+	protected Queue <FileQueue> fileQueue = new ConcurrentLinkedQueue <FileQueue> ();
 	private boolean halt = false;
 	private File folder = null;
-	private Log log = null;
+	private ConnectionInfo ci = null;
+	private FileQueueManager fqm = null;
 	
 	//FIXED I believe this class is now thread safe due to the implementation of ConcurrentLinkedQueue instead of HashMap
 	
-	public FileLogger(File folder, Log log){
+	public FileLogger(File folder, ConnectionInfo ci){
 		this.folder = folder;
-		this.log = log;
+		this.ci = ci;
+		fqm = new FileQueueManager(this);
+		
+		//Register debugger variables
+		ci.debugger.registerVariable(new Variable("queue",queue,this.getClass().getName()));
+		ci.debugger.registerVariable(new Variable("fileQueue",fileQueue,this.getClass().getName()));
+		ci.debugger.registerVariable(new Variable("halt",halt,this.getClass().getName()));
+		ci.debugger.registerVariable(new Variable("folder",folder,this.getClass().getName()));
+	}
+	
+	public FileQueueManager getFileQueueManager(){
+		return fqm;
 	}
 	
 	public void halt(){
 		halt = true;
+		fqm.halt();
 	}
 	
 	public void logMessage(UUID uuid, String message){
@@ -53,16 +68,17 @@ public class FileLogger implements Runnable{
 	}
 	
 	public void playerDisconnected(UUID uuid){
-		for (FileQueue q : logs){
+		for (FileQueue q : fileQueue){
 			if (q.getUUID().equals(uuid)){
-				logs.remove(q);
+				q.getFile().close();
+				fileQueue.remove(q);
 				return;
 			}
 		}
 	}
 	
 	private boolean logsContains(UUID uuid){
-		for (FileQueue q : logs){
+		for (FileQueue q : fileQueue){
 			if (q.getUUID().equals(uuid)){
 				return true;
 			}
@@ -90,8 +106,8 @@ public class FileLogger implements Runnable{
 		return null;
 	}
 	
-	private FileQueue getLogQueue(UUID uuid){
-		for (FileQueue q : logs){
+	private FileQueue getFileQueue(UUID uuid){
+		for (FileQueue q : fileQueue){
 			if (q.getUUID().equals(uuid)){
 				return q;
 			}
@@ -103,12 +119,20 @@ public class FileLogger implements Runnable{
 		while(!halt){
 			for (MessageQueue m : queue){
 				try{
+					ci.log.debug("Logging to file: " + m.getMessage());
 					logToFile(m.getUUID(), m.getMessage());
 				}catch(Exception e){
-					log.warning("ERROR: " + e.getMessage() + " CAUSE: " + e.getCause());
+					ci.log.warning("ERROR: " + e.getMessage() + " CAUSE: " + e.getCause());
 					e.printStackTrace();
 				}
 				try{queue.remove(m);}catch(Exception e){}
+			}
+		}
+		for (FileQueue q : this.fileQueue){
+			if (q.getFile() != null){
+				if (!q.getFile().isClosed()){
+					q.getFile().close();
+				}
 			}
 		}
 	}
@@ -119,22 +143,22 @@ public class FileLogger implements Runnable{
 			if (!f.exists()){
 				try{f.createNewFile();}catch(Exception e){}
 			}
-			logs.add(new FileQueue(uuid, new Log(uuid.toString(), f, false)));
+			fileQueue.add(new FileQueue(uuid, new UUIDFile(new RandomAccessFile(f, ""))));
 		}
-		FileQueue l = getLogQueue(uuid);
+		FileQueue l = getFileQueue(uuid);
 		if (l != null){
-			if (l.getLog() != null){
-				l.getLog().info(message);
+			if (l.getFile() != null){
+				l.getFile().writeToFile(message);
 			}else{
 				File f = new File(folder + "/connection_logs/" + uuid.toString() + ".txt");
 				if (!f.exists()){
 					try{f.createNewFile();}catch(Exception e){}
 				}
-				l.setLog(new Log(uuid.toString(), f, false));
-				l.getLog().info(message);
+				l.setFile(new UUIDFile(new RandomAccessFile(f, "rwd")));
+				l.getFile().writeToFile(message);
 			}
 		}else{
-			throw new Exception("Unknown reason for LogQueue to be blank :o - Report to developer.");
+			throw new Exception("Unknown reason for FileQueue to be blank - Report to developer.");
 		}
 	}
 	

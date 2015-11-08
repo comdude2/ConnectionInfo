@@ -32,13 +32,18 @@ import java.util.LinkedList;
 
 import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
+import net.comdude2.plugins.connectioninfo.misc.Variable;
 import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 import net.comdude2.plugins.connectioninfo.net.GeoIP;
 import net.comdude2.plugins.connectioninfo.net.Location;
+import net.comdude2.plugins.connectioninfo.util.Debugger;
 import net.comdude2.plugins.connectioninfo.util.Log;
 import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
@@ -48,10 +53,17 @@ public class ConnectionInfo extends JavaPlugin{
 	public Listeners listeners = null;
 	public ConnectionHandler handle = null;
 	public boolean geoLocation = true;
+	public Debugger debugger = null;
 	
 	public void onEnable(){
 		//Save default config
 		this.saveDefaultConfig();
+		
+		//Reset variables
+		log = null;
+		listeners = null;
+		handle = null;
+		geoLocation = true;
 		
 		//Initialise log
 		File file = new File(this.getDataFolder().getAbsolutePath() + "/plugin_logs/");
@@ -60,6 +72,10 @@ public class ConnectionInfo extends JavaPlugin{
 		try{if(!file.exists()){boolean created = file.createNewFile();if (!created){this.getLogger().warning("Failed to create logger file!");}}
 		log = new Log(this.getDescription().getName(),file,true, this.getLogger());
 		}catch(Exception e){this.getServer().getPluginManager().disablePlugin(this);this.getLogger().severe("Failed to initialise logger.");return;}
+		
+		//Debugging
+		Debugger debugger = new Debugger(log, new File(this.getDataFolder() + "/debugger_DUMP.txt"));
+		this.debugger.registerVariable(new Variable("geoLocation",geoLocation,this.getClass().getName()));
 		
 		// Export licence
 		File path = new File("");
@@ -132,8 +148,16 @@ public class ConnectionInfo extends JavaPlugin{
 		listeners.unregister();
 		handle.stop();
 		this.getServer().getScheduler().cancelTasks(this);
+		debugger.unregisterVariables();
 		//TODO Add any save data sections here
 		log.info("Version: " + this.getDescription().getVersion() + " is now Disabled!");
+	}
+	
+	public void reload(){
+		log.info("Reloading myself...");
+		onDisable();
+		onEnable();
+		log.info("Reload complete.");
 	}
 	
 	private void exportResource(String resourceName, File destination) throws Exception {
@@ -241,6 +265,41 @@ public class ConnectionInfo extends JavaPlugin{
 		log.info("DB Name: " + this.getConfig().getString("Database.Name"));
 		log.info("DB Con Table Name: " + this.getConfig().getString("Database.Connection_log_table_name"));
 		log.info("DB Pl Table Name: " + this.getConfig().getString("Database.Plugin_log_table_name"));
+	}
+	
+	@Override //TODO Check permissions etc.
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (cmd.getName().equalsIgnoreCase("debugger")) { 
+			if (args.length > 0){
+				if (args.length == 1){
+					if (args[0].equalsIgnoreCase("log")){
+						debugger.printToLog();
+						message(sender, "Printed debugger to log.");
+					}else{
+						//Message
+					}
+				}else{
+					displayHelp(sender);
+				}
+			}else{
+				displayHelp(sender);
+			}
+		}else{
+			return false;
+		}
+		return false;
+	}
+	
+	private void message(CommandSender sender, String message){
+		sender.sendMessage(tag() + message);
+	}
+	
+	private String tag(){
+		return ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + this.getName() + ChatColor.DARK_GREEN + "] " + ChatColor.AQUA;
+	}
+	
+	public void displayHelp(CommandSender sender){
+		
 	}
 	
 }

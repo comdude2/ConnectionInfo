@@ -20,3 +20,4 @@ Database:
   Name: connectioninfo
   Connection_log_table_name: connection_log
   Plugin_log_table_name: plugin_log
+  Hostname_log_table_name: hostname_log

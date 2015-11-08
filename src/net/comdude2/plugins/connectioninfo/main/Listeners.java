@@ -65,11 +65,13 @@ public class Listeners implements Listener{
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerQuit(PlayerQuitEvent event){
 		ci.handle.endConnection(event);
+		ci.handle.getFileLogger().playerDisconnected(event.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled=true)
 	public void onPlayerKick(PlayerKickEvent event){
 		ci.handle.endConnection(event);
+		ci.handle.getFileLogger().playerDisconnected(event.getPlayer().getUniqueId());
 	}
 	
 	@SuppressWarnings("deprecation")
