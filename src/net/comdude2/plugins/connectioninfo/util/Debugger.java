@@ -26,11 +26,20 @@ public class Debugger {
 		variables.add(v);
 	}
 	
+	public int updateVariable(Variable v){
+		Variable var = this.findVariable(v);
+		if (var != null){
+			var.setVariable(v.getVariable());
+			return DebuggerResponse.UPDATED;
+		}
+		return DebuggerResponse.FAILED_TO_FIND;
+	}
+	
 	public void unregisterVariables(){
 		variables = new ConcurrentLinkedQueue <Variable> ();
 	}
 	
-	public boolean printToLog(){
+	public int printToLog(){
 		if (variables.size() > 0){
 			LinkedList <Variable> lvariables = sort();
 			log.info("###### DEBUGGER VARIABLE DUMP ######");
@@ -38,28 +47,28 @@ public class Debugger {
 				log.info("Class name: " + v.getClassName() + " Variable name: " + v.getName() + " Variable value: " + value(v.getVariable()));
 			}
 			log.info("###### DEBUGGER END OF DUMP ######");
-			return true;
+			return DebuggerResponse.COMPLETE;
 		}else{
-			return false;
+			return DebuggerResponse.NO_VARIABLES;
 		}
 	}
 	
-	public boolean printToFile(){
+	public int printToFile(){
 		if (variables.size() > 0){
 			
 			//Setup file
 			if (file.exists()){
 				boolean deleted = file.delete();
 				if (!deleted){
-					return false;
+					return DebuggerResponse.FILE_NOT_DELETED;
 				}
 				try{
 					boolean created = file.createNewFile();
 					if (!created){
-						return false;
+						return DebuggerResponse.FILE_NOT_CREATED;
 					}
 				}catch (IOException e){
-					return false;
+					return DebuggerResponse.EXCEPTION;
 				}
 			}
 			
@@ -78,15 +87,15 @@ public class Debugger {
 				if (x != null){
 					try{x.close();}catch(Exception e1){}
 				}
-				return false;
+				return DebuggerResponse.EXCEPTION;
 			}finally{
 				if (x != null){
 					try{x.close();}catch(Exception e){}
 				}
 			}
-			return true;
+			return DebuggerResponse.COMPLETE;
 		}else{
-			return false;
+			return DebuggerResponse.NO_VARIABLES;
 		}
 	}
 	
@@ -126,20 +135,35 @@ public class Debugger {
 		}else if (o instanceof UUID){
 			return String.valueOf((UUID)o);
 		}else if (o instanceof LinkedList){
-			String s = "State: NOTNULL ";
-			@SuppressWarnings("unchecked")
-			LinkedList <Object> list = (LinkedList <Object>)o;
-			s = s + "Size: " + list.size();
-			return s;
+			try{
+				String s = "State: NOTNULL ";
+				@SuppressWarnings("unchecked")
+				LinkedList <Object> list = (LinkedList <Object>)o;
+				s = s + "Size: " + list.size();
+				return s;
+			}catch (Exception e){return null;}
 		}else if (o instanceof ConcurrentLinkedQueue){
-			String s = "State: NOTNULL ";
-			@SuppressWarnings("unchecked")
-			ConcurrentLinkedQueue <Object> list = (ConcurrentLinkedQueue <Object>)o;
-			s = s + "Size: " + list.size();
-			return s;
+			try{
+				String s = "State: NOTNULL ";
+				@SuppressWarnings("unchecked")
+				ConcurrentLinkedQueue <Object> list = (ConcurrentLinkedQueue <Object>)o;
+				s = s + "Size: " + list.size();
+				return s;
+			}catch (Exception e){return null;}
 		}else{
 			return null;
 		}
+	}
+	
+	public Variable findVariable(Variable f){
+		for (Variable v : variables){
+			if (v.getName().equals(f.getName())){
+				if (v.getClassName().equals(f.getClassName())){
+					return v;
+				}
+			}
+		}
+		return null;
 	}
 	
 }

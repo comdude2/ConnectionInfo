@@ -20,6 +20,10 @@ public class Variable {
 		return this.variable;
 	}
 	
+	public void setVariable(Object o){
+		this.variable = o;
+	}
+	
 	public String getClassName(){
 		return this.className;
 	}
