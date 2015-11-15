@@ -100,6 +100,15 @@ public class ConnectionInfo extends JavaPlugin{
 			}
 		}
 		
+		//Check for dependencies
+		if (this.getServer().getPluginManager().getPlugin("ComLibrary") != null){
+			this.log.info("Found ComLibrary plugin.");
+		}else{
+			this.log.severe("ComLibrary plugin is missing, disabling myself, please put the ComLibrary plugin that was included in the zip file with this plugin into the plugins folder.");
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		
 		//Main
 		listeners = new Listeners(this);
 		handle = new ConnectionHandler(this);

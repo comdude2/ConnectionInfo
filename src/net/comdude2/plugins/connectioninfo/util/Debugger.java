@@ -15,8 +15,6 @@ public class Debugger {
 	private ConcurrentLinkedQueue <Variable> variables = new ConcurrentLinkedQueue <Variable> ();
 	private File file = null;
 	
-	//TODO Change return type from boolean to a new class called DebuggerResponse
-	
 	public Debugger(Log log, File file){
 		this.log = log;
 		this.file = file;
