@@ -10,3 +10,18 @@ commands:
       usage: /<command> [sub]
       permission: connectioninfo.debugger
       permission-message: You don't have <permission>
+   connectioninfo:
+      description: Main command for ConnectionInfo.
+      usage: /<command> [sub]
+      permission: connectioninfo.main
+      permission-message: You don't have <permission>
+   ci:
+      description: Main command for ConnectionInfo.
+      usage: /<command> [sub]
+      permission: connectioninfo.main
+      permission-message: You don't have <permission>
+   cinfo:
+      description: Main command for ConnectionInfo.
+      usage: /<command> [sub]
+      permission: connectioninfo.main
+      permission-message: You don't have <permission>

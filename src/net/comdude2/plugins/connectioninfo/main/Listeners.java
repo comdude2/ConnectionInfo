@@ -43,6 +43,7 @@ public class Listeners implements Listener{
 		ci.getLogger().info("Events registered.");
 	}
 	
+	//This is really important, this MUST be called onDisable() or it could lead to issues.
 	public void unregister(){
 		HandlerList.unregisterAll(this);
 		ci.getLogger().info("Events unregistered.");

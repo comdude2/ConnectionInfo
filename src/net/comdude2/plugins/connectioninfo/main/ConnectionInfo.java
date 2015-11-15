@@ -130,7 +130,9 @@ public class ConnectionInfo extends JavaPlugin{
 		}
 		
 		//Log database credentials
-		this.logDatabaseCredentials();
+		if (methods.contains(LoggingMethod.MYSQL)){
+			this.logDatabaseCredentials();
+		}
 		
 		//Enable
 		listeners.register();
@@ -143,7 +145,6 @@ public class ConnectionInfo extends JavaPlugin{
 		handle.stop();
 		this.getServer().getScheduler().cancelTasks(this);
 		debugger.unregisterVariables();
-		//TODO Add any save data sections here
 		log.info("Version: " + this.getDescription().getVersion() + " is now Disabled!");
 	}
 	
@@ -263,7 +264,7 @@ public class ConnectionInfo extends JavaPlugin{
 	
 	@Override //TODO Check permissions etc.
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("debugger")) { 
+		if (cmd.getName().equalsIgnoreCase("debugger")) {
 			if (args.length > 0){
 				if (args.length == 1){
 					if (args[0].equalsIgnoreCase("log")){
@@ -278,14 +279,40 @@ public class ConnectionInfo extends JavaPlugin{
 			}else{
 				displayHelp(sender);
 			}
+			return true;
+		}else if (cmd.getName().equalsIgnoreCase("connectioninfo") || cmd.getName().equalsIgnoreCase("ci") || cmd.getName().equalsIgnoreCase("cinfo")){
+			//Main command
+			if (args.length > 0){
+				if (args.length == 1){
+					if (args[0].equalsIgnoreCase("reload")){
+						if (sender.hasPermission("connectioninfo.reload")){
+							message(sender, ChatColor.YELLOW + "Reloading...");
+							reload();
+							message(sender, ChatColor.GREEN + "Reload complete.");
+						}else{
+							messagePermission(sender);
+						}
+					}else{
+						displayHelp(sender);
+					}
+				}else{
+					displayHelp(sender);
+				}
+			}else{
+				displayHelp(sender);
+			}
+			return true;
 		}else{
 			return false;
 		}
-		return false;
 	}
 	
 	private void message(CommandSender sender, String message){
 		sender.sendMessage(tag() + message);
+	}
+	
+	private void messagePermission(CommandSender sender){
+		sender.sendMessage(tag() + ChatColor.RED + "You don't have permission to perform this command.");
 	}
 	
 	private String tag(){

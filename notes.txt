@@ -1,1 +1,0 @@
-- Maybe make UUID_FILES use the library log class? Will need to make sure it appends the file and not overwrites it.
