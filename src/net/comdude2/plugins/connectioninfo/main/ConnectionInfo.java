@@ -64,6 +64,7 @@ public class ConnectionInfo extends JavaPlugin{
 		listeners = null;
 		handle = null;
 		geoLocation = true;
+		debugger = null;
 		
 		//Initialise log
 		File file = new File(this.getDataFolder().getAbsolutePath() + "/plugin_logs/");
@@ -128,23 +129,7 @@ public class ConnectionInfo extends JavaPlugin{
 			log.warning("No logging methods added, connections and attempts will not be logged!");
 		}
 		
-		//Test
-		log.info("Testing date difference method...");
-		Date n = new Date();
-		Date o = null;
-		try {
-			o = UnitConverter.getSDF().parse("2011-10-23 12:45:34.432");
-			log.info("Newer date: " + n.getTime() + " Older date: " + o.getTime());
-			String result = UnitConverter.getDateDiff(n, o);
-			log.info("Result: " + result);
-			log.info("Test passed.");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			log.warning("Test failed.");
-		}
-		
-		
+		//Log database credentials
 		this.logDatabaseCredentials();
 		
 		//Enable
