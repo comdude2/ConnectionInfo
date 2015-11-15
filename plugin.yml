@@ -25,3 +25,19 @@ commands:
       usage: /<command> [sub]
       permission: connectioninfo.main
       permission-message: You don't have <permission>
+permissions:
+    connectioninfo.*:
+        description: Gives access to all connectioninfo commands
+        children:
+            connectioninfo.main: true
+            connectioninfo.admin: true
+            connectioninfo.reload: true
+    connectioninfo.main:
+        description: Gives access to the main connectioninfo command.
+        default: true
+    connectioninfo.admin:
+        description: Gives access to admin commands.
+        default: op
+    connectioninfo.reload:
+        description: Allows the reloading of this plugin.
+        default: op

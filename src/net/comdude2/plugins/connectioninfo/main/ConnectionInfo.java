@@ -29,10 +29,12 @@ import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.UUID;
 
 import net.comdude2.plugins.connectioninfo.io.ConnectionHandler;
 import net.comdude2.plugins.connectioninfo.misc.LoggingMethod;
 import net.comdude2.plugins.connectioninfo.misc.Variable;
+import net.comdude2.plugins.connectioninfo.net.Connection;
 import net.comdude2.plugins.connectioninfo.net.DatabaseLogger;
 import net.comdude2.plugins.connectioninfo.net.GeoIP;
 import net.comdude2.plugins.connectioninfo.net.Location;
@@ -42,8 +44,10 @@ import net.comdude2.plugins.connectioninfo.util.UnitConverter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
@@ -291,6 +295,48 @@ public class ConnectionInfo extends JavaPlugin{
 							message(sender, ChatColor.GREEN + "Reload complete.");
 						}else{
 							messagePermission(sender);
+						}
+					}else{
+						displayHelp(sender);
+					}
+				}else if (args.length == 2){
+					if (args[0].equalsIgnoreCase("details")){//Intended to get connection details for a provided player or UUID
+						//Should this just show basic information or should i get data from the storage method?
+						boolean isUUID = false;
+						try{UUID uuid = UUID.fromString(args[1]);if (uuid != null){isUUID = true;}}catch(Exception e){}
+						UUID uuid = null;
+						if (isUUID){
+							uuid = UUID.fromString(args[1]);
+						}else{
+							//Player
+							boolean found = false;
+							for (Player p : this.getServer().getOnlinePlayers()){
+								if (p.getName().equalsIgnoreCase(args[1])){
+									uuid = p.getUniqueId();
+									found = true;
+									break;
+								}
+							}
+							if (!found){
+								//If i need a connection object how am i going to report an offline player?
+								for (OfflinePlayer op : this.getServer().getOfflinePlayers()){
+									if (op.getName().equalsIgnoreCase(args[1])){
+										uuid = op.getUniqueId();
+										found = true;
+										break;
+									}
+								}
+								if (!found){
+									message(sender, ChatColor.RED + "Player not found.");
+								}
+							}
+						}
+						Connection connection  = handle.getConnection(uuid);
+						if (connection != null){
+						message(sender, "Connection information for: " + uuid.toString());
+						message(sender, "");
+						}else{
+							message(sender, ChatColor.RED + "Couldn't find connection object.");
 						}
 					}else{
 						displayHelp(sender);
